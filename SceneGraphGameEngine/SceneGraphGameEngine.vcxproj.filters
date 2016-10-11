@@ -22,6 +22,9 @@
     <Filter Include="Header Files\Components">
       <UniqueIdentifier>{98de261b-e5e4-4e99-8fbd-40f8480a0a5a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Renderers">
+      <UniqueIdentifier>{29b04438-feef-415c-9087-f1776a4b7a37}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GraphicsTypedefs.h">
@@ -66,6 +69,9 @@
     <ClInclude Include="Game.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Terrain.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GraphicsInclude.cpp">
@@ -108,6 +114,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Game.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Terrain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

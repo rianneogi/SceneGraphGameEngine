@@ -1,6 +1,6 @@
 #pragma once
 
-#include "GameObject.h"
+#include "Terrain.h"
 
 class Game
 {
@@ -10,9 +10,10 @@ public:
 
 	Camera mCamera;
 
-	Mesh m;
 	std::vector<ShaderProgram> mShaders;
+	Terrain mTerrain;
 	Texture t;
+	Mesh m;
 
 	bool init();
 

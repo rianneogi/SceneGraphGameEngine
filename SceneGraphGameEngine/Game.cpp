@@ -14,6 +14,7 @@ Game::~Game()
 bool Game::init()
 {
 	mCamera.setPosition(glm::vec3(0, 0, 0));
+	mTerrain.generate();
 	m.loadFromFile("Resources//Models//alduin.obj");
 	t.loadFromFile("Resources//Textures//alduin.jpg");
 	mShaders.push_back(ShaderProgram());
@@ -49,7 +50,7 @@ void Game::render(SDL_Window* window)
 	mShaders[0].setUniformMat4f("V", view);
 	mShaders[0].setUniformMat4f("P", projection);
 	
-	m.render();
+	mTerrain.render();
 
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_ONE, GL_ONE);
@@ -61,15 +62,15 @@ void Game::render(SDL_Window* window)
 	mShaders[1].setUniformMat4f("gViewMat", view);
 	mShaders[1].setUniformMat4f("gProjectionMat", projection);
 	mShaders[1].setUniformVec3f("gEyePos", mCamera.mPosition);
-	m.render();
+	mTerrain.render();
 
-	mShaders[2].bind();
+	/*mShaders[2].bind();
 	mShaders[2].setUniformMat4f("gModelMat", glm::scale(glm::vec3(1, 1, 1)));
 	mShaders[2].setUniformMat4f("gViewMat", view);
 	mShaders[2].setUniformMat4f("gProjectionMat", projection);
 	mShaders[2].setUniformVec3f("gEyePos", mCamera.mPosition);
 	mShaders[2].setUniformVec3f("gLight.pos", mCamera.mPosition);
-	m.render();
+	mTerrain.render();*/
 
 	glDepthMask(true);
 	glDisable(GL_BLEND);

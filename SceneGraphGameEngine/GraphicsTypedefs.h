@@ -21,6 +21,11 @@ struct Vector2f
 	float x, y;
 	Vector2f() : x(0), y(0) {}
 	Vector2f(float a, float b) : x(a), y(b) {}
+
+	bool operator==(const Vector2f& other)
+	{
+		return (x == other.x && y == other.y);
+	}
 };
 
 struct Vector3f
@@ -29,4 +34,9 @@ struct Vector3f
 	Vector3f() : x(0), y(0), z(0) {}
 	Vector3f(float a, float b, float c) : x(a), y(b), z(c) {}
 	Vector3f(Vector2f a, float b) : x(a.x), y(a.y), z(b) {}
+
+	bool operator==(const Vector3f& other)
+	{
+		return (x == other.x && y == other.y && z == other.z);
+	}
 };
