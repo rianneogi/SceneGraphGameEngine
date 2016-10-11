@@ -1,0 +1,49 @@
+#version 330 core
+ 
+// Interpolated values from the vertex shaders
+in vec2 UV;
+in vec3 fragPos;
+in vec3 fragNormal;
+ 
+// Ouput data
+out vec4 color;
+ 
+// Values that stay constant for the whole mesh.
+uniform sampler2D textureSampler;
+
+uniform mat4 gModelMat;
+uniform vec3 gEyePos;
+uniform struct Light {
+	vec3 pos;
+	vec3 color;
+	float intensity;
+} gLight;
+ 
+void main()
+{ 
+    //diffuse
+	vec3 vertexPosition_worldspace = (gModelMat*vec4(fragPos,1)).xyz;
+	vec3 lightDirection = gLight.pos - vertexPosition_worldspace;
+	float distance = length(lightDirection);
+	lightDirection = normalize(lightDirection);
+
+	float cosTheta = clamp( dot( fragNormal,lightDirection ), 0,1 );
+	
+	vec3 diffuseVector = vec3(cosTheta,cosTheta,cosTheta);
+
+	float attenuation = 1.0/(0.5+ (distance*distance)/gLight.intensity);
+    
+	//specular
+	vec3 eyeVector = normalize(gEyePos-vertexPosition_worldspace);
+	vec3 reflection = normalize(reflect(-lightDirection,fragNormal));
+	float cosAlpha = clamp( dot( eyeVector,reflection ), 0,1 );
+	//vec3 halfway = normalize(lightDirection + eyeVector);
+	//float cosAlpha = clamp(dot(fragNormal,halfway),0,1);
+	cosAlpha = pow(cosAlpha,5);
+		
+	vec3 specularVector = vec3(cosAlpha,cosAlpha,cosAlpha);
+
+	vec3 res = ((diffuseVector + specularVector) * gLight.color * attenuation);
+
+    color = vec4(res,1.0)*texture( textureSampler, UV );
+}

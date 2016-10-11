@@ -1,0 +1,89 @@
+#version 400 core
+
+in vec2 UV;
+in vec3 fragPos;
+in vec3 fragNormal;
+//in vec4 shadowCoord;
+
+out vec4 outputColor;
+
+#define MAX_LIGHTS 4
+
+uniform sampler2D gTextureSampler;
+//uniform sampler2D gShadowMap;
+
+uniform mat4 gModelMat;
+uniform vec3 gEyePos;
+uniform int gLightCount;
+uniform struct Light {
+	vec4 pos;
+	vec3 color;
+	float intensity;
+} gLights[MAX_LIGHTS];
+
+vec3 gamma(vec3 color)
+{
+    return pow(color, vec3(1.0/2.2));
+}
+
+vec3 getLighting(int id)
+{
+	if(gLights[id].pos.w == 1.0) //point light
+	{
+		//diffuse
+		vec3 vertexPosition_worldspace = (gModelMat*vec4(fragPos,1)).xyz;
+		vec3 lightDirection = gLights[id].pos.xyz - vertexPosition_worldspace;
+		float distance = length(lightDirection);
+
+		lightDirection = normalize(lightDirection);
+		float cosTheta = clamp( dot( fragNormal,lightDirection ), 0,1 );
+		
+		vec3 diffuseVector = vec3(cosTheta,cosTheta,cosTheta);
+
+		float attenuation = 1.0/(0.5+ (distance*distance)/gLights[id].intensity);
+    
+		//specular
+		vec3 eyeVector = normalize(gEyePos-vertexPosition_worldspace);
+		vec3 reflection = normalize(reflect(-lightDirection,fragNormal));
+		float cosAlpha = clamp( dot( eyeVector,reflection ), 0,1 );
+		//vec3 halfway = normalize(lightDirection + eyeVector);
+		//float cosAlpha = clamp(dot(fragNormal,halfway),0,1);
+		cosAlpha = pow(cosAlpha,5);
+		
+		vec3 specularVector = vec3(cosAlpha,cosAlpha,cosAlpha);
+
+		return ((diffuseVector + specularVector) * gLights[id].color * attenuation);
+	}
+	else //directional light
+	{
+		float cosTheta = clamp( dot( fragNormal,-gLights[id].pos.xyz ), 0,1 );
+		
+		vec3 diffuseVector = vec3(cosTheta,cosTheta,cosTheta);
+		
+		vec3 vertexPosition_worldspace = (gModelMat*vec4(fragPos,1)).xyz;
+		vec3 eyeVector = normalize(gEyePos-vertexPosition_worldspace);
+		vec3 reflection = normalize(reflect(gLights[id].pos.xyz,fragNormal));
+		float cosAlpha = clamp( dot(eyeVector,reflection), 0,1 );
+		//vec3 halfway = normalize(gLights[id].pos.xyz + eyeVector);
+		//float cosAlpha = clamp(normalize(dot(fragNormal,halfway)),0,1);
+		cosAlpha = pow(cosAlpha,5);
+		
+		vec3 specularVector = vec3(cosAlpha,cosAlpha,cosAlpha);
+
+		return gLights[id].intensity*gLights[id].color*(diffuseVector + specularVector);
+	}
+}
+
+
+void main()
+{	
+	vec4 tex = texture(gTextureSampler,UV);
+	vec3 color = vec3(0.1,0.1,0.1);
+	for(int i = 0;i<gLightCount;i++)
+    {
+		color += getLighting(i);
+    }
+
+    outputColor = tex*vec4(color, 1.0);
+    //outputColor = vec4(gamma(outputColor.xyz),outputColor.w);
+}

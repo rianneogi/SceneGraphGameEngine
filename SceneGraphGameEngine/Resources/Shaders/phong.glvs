@@ -1,0 +1,26 @@
+#version 330 core
+
+layout(location = 0) in vec3 vertexPosition_modelspace;
+layout(location = 1) in vec2 vertexUV;
+layout(location = 2) in vec3 vertexNormal;
+
+out vec2 UV;
+out vec3 fragPos;
+out vec3 fragNormal;
+//out float fragOcclusion;
+//out vec4 shadowCoord;
+
+uniform mat4 gModelMat;
+uniform mat4 gViewMat;
+uniform mat4 gProjectionMat;
+//uniform mat4 gDepthBiasMVP;
+
+void main()
+{
+    UV = vertexUV;
+	fragPos = vertexPosition_modelspace;
+	fragNormal = vertexNormal;
+    gl_Position = gProjectionMat*gViewMat*gModelMat * vec4(vertexPosition_modelspace,1);
+	//fragOcclusion = vertexOcclusion;
+	//shadowCoord = gDepthBiasMVP * vec4(vertexPosition_modelspace,1);
+}
