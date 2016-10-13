@@ -10,7 +10,7 @@ Terrain::~Terrain()
 
 void Terrain::generate()
 {
-	std::vector<Vertex> Vertices;
+	std::vector<VertexTex3D> Vertices;
 	std::vector<unsigned int> Indices;
 	unsigned int curr_ind = 0;
 
@@ -19,10 +19,10 @@ void Terrain::generate()
 		for (int j = 0;j < 100;j++)
 		{
 			printf("%f\n", glm::perlin(glm::vec2(i/ 1.0, j / 100.0)), j );
-			Vertices.push_back(Vertex(Vector3f(i, 5*glm::perlin(glm::vec2(i/10.0,j/10.0)), j), Vector2f(0, 0), Vector3f(0, 1, 0)));
-			Vertices.push_back(Vertex(Vector3f(i, 5*glm::perlin(glm::vec2(i/10.0, (j+1)/10.0)), j+1), Vector2f(0, 1), Vector3f(0, 1, 0)));
-			Vertices.push_back(Vertex(Vector3f(i+1, 5*glm::perlin(glm::vec2((i+1)/10.0, j/10.0)), j), Vector2f(1, 0), Vector3f(0, 1, 0)));
-			Vertices.push_back(Vertex(Vector3f(i+1, 5*glm::perlin(glm::vec2((i+1)/10.0, (j+1)/10.0)), j+1), Vector2f(1, 1), Vector3f(0, 1, 0)));
+			Vertices.push_back(VertexTex3D(Vector3f(i, 5*glm::perlin(glm::vec2(i/10.0,j/10.0)), j), Vector3f(0, 0, 0), Vector3f(0, 1, 0)));
+			Vertices.push_back(VertexTex3D(Vector3f(i, 5*glm::perlin(glm::vec2(i/10.0, (j+1)/10.0)), j+1), Vector3f(0, 1, 0), Vector3f(0, 1, 0)));
+			Vertices.push_back(VertexTex3D(Vector3f(i+1, 5*glm::perlin(glm::vec2((i+1)/10.0, j/10.0)), j), Vector3f(1, 0, 0), Vector3f(0, 1, 0)));
+			Vertices.push_back(VertexTex3D(Vector3f(i+1, 5*glm::perlin(glm::vec2((i+1)/10.0, (j+1)/10.0)), j+1), Vector3f(1, 1, 0), Vector3f(0, 1, 0)));
 
 			Indices.push_back(curr_ind);
 			Indices.push_back(curr_ind+1);

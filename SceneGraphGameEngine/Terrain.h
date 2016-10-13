@@ -5,7 +5,7 @@
 class Terrain
 {
 public:
-	MeshData mMesh;
+	MeshDataTexture3D mMesh;
 	Texture mTexture;
 
 	Terrain();

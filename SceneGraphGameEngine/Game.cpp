@@ -13,10 +13,11 @@ Game::~Game()
 
 bool Game::init()
 {
+	loadTextures();
 	mCamera.setPosition(glm::vec3(0, 0, 0));
 	mTerrain.generate();
-	m.loadFromFile("Resources//Models//alduin.obj");
-	t.loadFromFile("Resources//Textures//alduin.jpg");
+	m.loadFromFile("Resources//Models//uvsphere_highres.obj");
+	t.loadFromFile("Resources//Textures//sky.png");
 	mShaders.push_back(ShaderProgram());
 	mShaders.push_back(ShaderProgram());
 	mShaders.push_back(ShaderProgram());
@@ -43,7 +44,9 @@ void Game::render(SDL_Window* window)
 	glm::mat4 model, view, projection;
 
 	mCamera.render(view, projection);
-	t.bind();
+	
+	//t.bind();
+	gTerrainTexture.bind();
 
 	mShaders[0].bind();
 	mShaders[0].setUniformMat4f("M", glm::scale(glm::vec3(1,1,1)));

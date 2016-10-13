@@ -1,14 +1,20 @@
 #version 330
 
-// Input vertex data, different for all executions of this shader.
 layout(location = 0) in vec3 vertexPosition_modelspace;
 
-// Notice that the "1" here equals the "1" in glVertexAttribPointer
+#ifdef MULTI_TEXTURE
+layout(location = 1) in vec3 vertexUV;
+#else
 layout(location = 1) in vec2 vertexUV;
+#endif
 
 layout(location = 2) in vec3 vertexNormal;
 
+#ifdef MULTI_TEXTURE
+out vec3 UV;
+#else
 out vec2 UV;
+#endif
 out vec3 fragPos;
 out vec3 fragNormal;
  

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Terrain.h"
+#include "LoadResources.h"
 
 class Game
 {

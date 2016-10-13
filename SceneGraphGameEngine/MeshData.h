@@ -44,7 +44,7 @@ public:
 	MeshDataTexture3D();
 	~MeshDataTexture3D();
 
-	bool Init(const std::vector<VertexTex3D>& Vertices, const std::vector<unsigned int>& Indices);
+	bool init(const std::vector<VertexTex3D>& Vertices, const std::vector<unsigned int>& Indices);
 	void render();
 	void clear();
 

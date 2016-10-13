@@ -118,7 +118,7 @@ void MeshDataTexture3D::clear()
 	glDeleteBuffers(1, &IB);
 }
 
-bool MeshDataTexture3D::Init(const std::vector<VertexTex3D>& Vertices, const std::vector<unsigned int>& Indices)
+bool MeshDataTexture3D::init(const std::vector<VertexTex3D>& Vertices, const std::vector<unsigned int>& Indices)
 {
 	clear();
 

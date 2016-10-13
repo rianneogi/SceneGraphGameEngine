@@ -1,16 +1,20 @@
 #version 330 core
  
-// Interpolated values from the vertex shaders
+#ifdef MULTI_TEXTURE
+in vec3 UV;
+#else
 in vec2 UV;
+#endif
  
-// Ouput data
 out vec4 color;
- 
-// Values that stay constant for the whole mesh.
+
+#ifdef MULTI_TEXTURE
+uniform sampler2DArray textureSampler;
+#else
 uniform sampler2D textureSampler;
+#endif
  
 void main()
 { 
-    // Output color = color of the texture at the specified UV
     color = 0.1*texture( textureSampler, UV );
 }
