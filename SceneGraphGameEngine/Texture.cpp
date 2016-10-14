@@ -15,7 +15,7 @@ void Texture::freeTexture()
 	//Delete texture
 	if (mTextureID != 0)
 	{
-		//printf("freeing texture: %d\n", mTextureID);
+		printf("freeing texture: %d\n", mTextureID);
 		glDeleteTextures(1, &mTextureID);
 		mTextureID = 0;
 	}
@@ -106,14 +106,17 @@ bool Texture::loadFromFile(std::string path)
 	{
 		printf("Unable to load %s\n", path.c_str());
 	}
-
+	else
+	{
+		printf("Generated texture id %d for texture %s\n", mTextureID, path);
+	}
+	
 	return textureLoaded;
 }
 
 void Texture::bind()
 {
 	glActiveTexture(GL_TEXTURE0);
-	//sf::Texture::bind(&mTex);
 	glBindTexture(GL_TEXTURE_2D, mTextureID);
 }
 

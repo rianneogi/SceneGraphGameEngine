@@ -1,16 +1,14 @@
 #pragma once
 
-#include "GraphicsInclude.h"
+#include "Texture.h"
 
-///Wrapper class for sf::Texture
-
-class Texture
+class Texture2DArray
 {
 public:
-	Texture();
-	~Texture();
+	Texture2DArray();
+	~Texture2DArray();
 
-	bool loadFromFile(std::string path);
+	bool loadFromFile(std::vector<std::string> paths);
 	bool loadTextureFromPixels32(GLuint* pixels, GLuint width, GLuint height);
 	void freeTexture();
 	void bind(); //binds texture to GL_TEXTURE0
@@ -21,7 +19,5 @@ public:
 	GLuint mTextureID;
 	unsigned int mTextureWidth;
 	unsigned int mTextureHeight;
+	unsigned int mTextureDepth;
 };
-
-
-

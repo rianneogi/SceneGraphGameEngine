@@ -3,6 +3,7 @@
 #include "Terrain.h"
 
 extern GLuint gTerrain3DTexture;
+extern std::vector<Texture*> gTileTextures;
 
 //bool generate3DTexture();
 bool loadTextures();

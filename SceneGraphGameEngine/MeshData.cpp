@@ -89,7 +89,7 @@ void MeshData::render()
 	glDisableVertexAttribArray(2);
 }
 
-MeshDataTexture3D::MeshDataTexture3D()
+MeshDataTex2DArray::MeshDataTex2DArray()
 {
 	VB = 0;
 	IB = 0;
@@ -97,12 +97,12 @@ MeshDataTexture3D::MeshDataTexture3D()
 	MaterialIndex = 0;
 }
 
-MeshDataTexture3D::~MeshDataTexture3D()
+MeshDataTex2DArray::~MeshDataTex2DArray()
 {
 	clear();
 }
 
-void MeshDataTexture3D::clear()
+void MeshDataTex2DArray::clear()
 {
 	// Disable the two vertex array attributes.
 	glDisableVertexAttribArray(0);
@@ -118,7 +118,7 @@ void MeshDataTexture3D::clear()
 	glDeleteBuffers(1, &IB);
 }
 
-bool MeshDataTexture3D::init(const std::vector<VertexTex3D>& Vertices, const std::vector<unsigned int>& Indices)
+bool MeshDataTex2DArray::init(const std::vector<VertexTex2DArray>& Vertices, const std::vector<unsigned int>& Indices)
 {
 	clear();
 
@@ -126,7 +126,7 @@ bool MeshDataTexture3D::init(const std::vector<VertexTex3D>& Vertices, const std
 	// The following commands will talk about our 'vertexbuffer' buffer
 	glBindBuffer(GL_ARRAY_BUFFER, VB);
 	// Give our vertices to OpenGL.
-	glBufferData(GL_ARRAY_BUFFER, sizeof(VertexTex3D)*Vertices.size(), &Vertices[0], GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(VertexTex2DArray)*Vertices.size(), &Vertices[0], GL_STATIC_DRAW);
 
 	/*for (int i = Vertices.size()-1;i >=0;i--)
 	{
@@ -144,7 +144,7 @@ bool MeshDataTexture3D::init(const std::vector<VertexTex3D>& Vertices, const std
 	return true;
 }
 
-void MeshDataTexture3D::render()
+void MeshDataTex2DArray::render()
 {
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
@@ -152,9 +152,9 @@ void MeshDataTexture3D::render()
 	//glEnableVertexAttribArray(3);
 
 	glBindBuffer(GL_ARRAY_BUFFER, VB);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(VertexTex3D), (const GLvoid*)offsetof(VertexTex3D, Pos));
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(VertexTex3D), (const GLvoid*)offsetof(VertexTex3D, UV));
-	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(VertexTex3D), (const GLvoid*)offsetof(VertexTex3D, Normal));
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(VertexTex2DArray), (const GLvoid*)offsetof(VertexTex2DArray, Pos));
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(VertexTex2DArray), (const GLvoid*)offsetof(VertexTex2DArray, UV));
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(VertexTex2DArray), (const GLvoid*)offsetof(VertexTex2DArray, Normal));
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IB);
 	//printf("4 %d, using buffers %d and %d\n", mEntries[i].NumIndices, mEntries[i].VB, mEntries[i].IB);

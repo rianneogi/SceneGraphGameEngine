@@ -4,10 +4,10 @@ const int TEXTURE_WIDTH = 16;
 const int TEXTURE_HEIGHT = 16;
 const int BYTES_PER_TEXEL = 4;
 
-std::vector<Texture> gTileTextures;
+std::vector<Texture*> gTileTextures;
 GLuint gTerrain3DTexture;
 
-bool generate3DTexture()
+bool generateTextureArray()
 {
 	GLenum err = GL_NO_ERROR;
 	//typedef char BYTE;
@@ -17,7 +17,7 @@ bool generate3DTexture()
 	for (size_t i = 0;i < gTileTextures.size();i++)
 	{
 		//sf::Image img = gTextures[i].mTex.copyToImage();
-		gTileTextures[i].bind();
+		gTileTextures[i]->bind();
 		glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE, &texels[BYTES_PER_TEXEL*TEXTURE_WIDTH*TEXTURE_HEIGHT*i]);
 		//glReadPixels(0, 0, TEXTURE_WIDTH, TEXTURE_HEIGHT, GL_RGBA, GL_UNSIGNED_BYTE, &texels[BYTES_PER_TEXEL*TEXTURE_WIDTH*TEXTURE_HEIGHT*i]);
 		//for (int j = 0;j < TEXTURE_HEIGHT;j++)
@@ -68,8 +68,8 @@ bool generate3DTexture()
 
 bool loadTileTexture(std::string path)
 {
-	gTileTextures.push_back(Texture());
-	if (!gTileTextures[gTileTextures.size()-1].loadFromFile(path))
+	gTileTextures.push_back(new Texture());
+	if (!gTileTextures[gTileTextures.size()-1]->loadFromFile(path))
 	{
 		printf("Unable to load texture: %s\n", path);
 		return false;
@@ -83,6 +83,6 @@ bool loadTextures()
 	res = res && loadTileTexture("Resources\\Textures\\dirt.png");
 	res = res && loadTileTexture("Resources\\Textures\\brick.png");
 	res = res && loadTileTexture("Resources\\Textures\\sand.png");
-
-	return res && generate3DTexture();
+	
+	return res && generateTextureArray();
 }

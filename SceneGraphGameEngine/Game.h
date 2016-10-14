@@ -16,6 +16,7 @@ public:
 	Mesh m;
 
 	bool init();
+	void cleanup();
 
 	void render(SDL_Window* window);
 	void update(int deltaTime);

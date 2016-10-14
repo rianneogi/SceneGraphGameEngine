@@ -2,27 +2,52 @@
 
 Terrain::Terrain()
 {
+	mTexture = NULL;
+	//mMesh = NULL;
 }
 
 Terrain::~Terrain()
 {
 }
 
+glm::vec3 Terrain::calculateNormal(int x, int z)
+{
+	glm::vec3 normal = glm::vec3(getHeight(x - 1, z) - getHeight(x + 1, z), 2, getHeight(x, z-1) - getHeight(x, z+1));
+	return glm::normalize(normal);
+}
+
+float Terrain::getHeight(int x, int z)
+{
+	return mHeightMap[x*mWidth + z];
+}
+
 void Terrain::generate()
 {
-	std::vector<VertexTex3D> Vertices;
+	std::vector<VertexTex2DArray> Vertices;
 	std::vector<unsigned int> Indices;
 	unsigned int curr_ind = 0;
 
-	for (int i = 0;i < 100;i++)
+	mWidth = 100;
+	mLength = 100;
+	mHeightMap = new float[(mWidth+2)*(mLength+2)];
+	for (int i = 0;i < mLength+2;i++)
 	{
-		for (int j = 0;j < 100;j++)
+		for (int j = 0;j < mWidth+2;j++)
 		{
-			printf("%f\n", glm::perlin(glm::vec2(i/ 1.0, j / 100.0)), j );
-			Vertices.push_back(VertexTex3D(Vector3f(i, 5*glm::perlin(glm::vec2(i/10.0,j/10.0)), j), Vector3f(0, 0, 0), Vector3f(0, 1, 0)));
-			Vertices.push_back(VertexTex3D(Vector3f(i, 5*glm::perlin(glm::vec2(i/10.0, (j+1)/10.0)), j+1), Vector3f(0, 1, 0), Vector3f(0, 1, 0)));
-			Vertices.push_back(VertexTex3D(Vector3f(i+1, 5*glm::perlin(glm::vec2((i+1)/10.0, j/10.0)), j), Vector3f(1, 0, 0), Vector3f(0, 1, 0)));
-			Vertices.push_back(VertexTex3D(Vector3f(i+1, 5*glm::perlin(glm::vec2((i+1)/10.0, (j+1)/10.0)), j+1), Vector3f(1, 1, 0), Vector3f(0, 1, 0)));
+			mHeightMap[i * mWidth + j] = 5 * glm::perlin(glm::vec2(i / 10.0, j / 10.0));
+		}
+	}
+
+	for (int i = 1;i < mLength+1;i++)
+	{
+		for (int j = 1;j < mWidth+1;j++)
+		{
+			int tex = 3;
+			//printf("%d %d", i, j);
+			Vertices.push_back(VertexTex2DArray(glm::vec3(i,getHeight(i,j), j), glm::vec3(0, 0, tex), calculateNormal(i,j)));
+			Vertices.push_back(VertexTex2DArray(glm::vec3(i, getHeight(i,j+1), j+1), glm::vec3(0, 1, tex), calculateNormal(i, j+1)));
+			Vertices.push_back(VertexTex2DArray(glm::vec3(i+1, getHeight(i+1, j), j), glm::vec3(1, 0, tex), calculateNormal(i+1, j)));
+			Vertices.push_back(VertexTex2DArray(glm::vec3(i+1, getHeight(i+1, j + 1), j+1), glm::vec3(1, 1, tex), calculateNormal(i+1, j+1)));
 
 			Indices.push_back(curr_ind);
 			Indices.push_back(curr_ind+1);
@@ -36,7 +61,7 @@ void Terrain::generate()
 	}
 
 	//post-processing
-	for (int i = 0;i < Vertices.size();i++)
+	/*for (int i = 0;i < Vertices.size();i++)
 	{
 		for (int j = i + 1;j < Vertices.size();j++)
 		{
@@ -52,7 +77,7 @@ void Terrain::generate()
 				Vertices.erase(Vertices.begin() + j);
 			}
 		}
-	}
+	}*/
 
 	mMesh.init(Vertices, Indices);
 }

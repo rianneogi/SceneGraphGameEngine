@@ -115,7 +115,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="BasicShader.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameComponent.h" />
@@ -130,10 +129,10 @@
     <ClInclude Include="ShaderProgram.h" />
     <ClInclude Include="Terrain.h" />
     <ClInclude Include="Texture.h" />
+    <ClInclude Include="Texture2DArray.h" />
     <ClInclude Include="Timer.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="BasicShader.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameComponent.cpp" />
@@ -148,6 +147,7 @@
     <ClCompile Include="ShaderProgram.cpp" />
     <ClCompile Include="Terrain.cpp" />
     <ClCompile Include="Texture.cpp" />
+    <ClCompile Include="Texture2DArray.cpp" />
     <ClCompile Include="Timer.cpp" />
   </ItemGroup>
   <ItemGroup>

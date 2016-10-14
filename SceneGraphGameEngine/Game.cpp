@@ -1,7 +1,7 @@
 #include "Game.h"
 
 float gSpeed = 0.25f;
-float gMouseSpeed = 0.0125f;
+float gMouseSpeed = 0.0075f;
 
 Game::Game()
 {
@@ -21,13 +21,13 @@ bool Game::init()
 	mShaders.push_back(ShaderProgram());
 	mShaders.push_back(ShaderProgram());
 	mShaders.push_back(ShaderProgram());
-	mShaders[0].loadProgram("Resources//Shaders//forward_ambient");
-	mShaders[1].loadProgram("Resources//Shaders//forward_directional");
-	mShaders[2].loadProgram("Resources//Shaders//forward_point");
+	mShaders[0].loadProgram("Resources//Shaders//forward_ambient", "#define MULTI_TEXTURE\n");
+	mShaders[1].loadProgram("Resources//Shaders//forward_directional", "#define MULTI_TEXTURE\n");
+	mShaders[2].loadProgram("Resources//Shaders//forward_point", "#define MULTI_TEXTURE\n");
 
 	mShaders[1].bind();
 
-	mShaders[1].setUniformVec3f("gLight.dir", glm::vec3(-1, 1, 1));
+	mShaders[1].setUniformVec3f("gLight.dir", glm::vec3(-1, -1, 1));
 	mShaders[1].setUniformFloat("gLight.intensity", 1);
 	mShaders[1].setUniformVec3f("gLight.color", glm::vec3(1, 1, 1));
 
@@ -45,8 +45,10 @@ void Game::render(SDL_Window* window)
 
 	mCamera.render(view, projection);
 	
+	//gTileTextures[0]->bind();
 	//t.bind();
-	gTerrainTexture.bind();
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D_ARRAY, gTerrain3DTexture);
 
 	mShaders[0].bind();
 	mShaders[0].setUniformMat4f("M", glm::scale(glm::vec3(1,1,1)));
@@ -87,7 +89,7 @@ void Game::update(int deltaTime)
 
 void Game::handleEvent(SDL_Event e, int deltaTime)
 {
-	printf("%d\n", deltaTime);
+	printf("deltatime: %d\n", deltaTime);
 	//deltaTime = deltaTime / 1000;
 	if (e.type == SDL_MOUSEMOTION)
 	{
@@ -148,14 +150,21 @@ void Game::handleEvent(SDL_Event e, int deltaTime)
 		gOcclusionCulling = !gOcclusionCulling;
 		}*/
 	}
-	printf("pos %f %f %f\n", mCamera.mPosition.x, mCamera.mPosition.y, mCamera.mPosition.z);
-	printf("dir %f %f %f\n", mCamera.mDirection.x, mCamera.mDirection.y, mCamera.mDirection.z);
 
 	/*if (e.type == sf::Event::MouseWheelMoved)
 	{
 	gCamera.FoV = std::max(30.f,std::min(60.f, gCamera.FoV-e.mouseWheel.delta));
 	}*/
 	//mCamera.update();
+}
+
+void Game::cleanup()
+{
+	for (int i = 0;i < gTileTextures.size();i++)
+	{
+		delete gTileTextures[i];
+	}
+	glDeleteTextures(1, &gTerrain3DTexture);
 }
 
 

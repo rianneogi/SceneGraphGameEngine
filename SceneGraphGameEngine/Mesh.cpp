@@ -73,9 +73,9 @@ void Mesh::InitMesh(unsigned int Index, const aiMesh* paiMesh)
 		const aiVector3D* pNormal = paiMesh->HasNormals() ? &(paiMesh->mNormals[i]) : &Zero3D;
 		const aiVector3D* pTexCoord = paiMesh->HasTextureCoords(0) ? &(paiMesh->mTextureCoords[0][i]) : &Zero3D;
 
-		Vertex v(Vector3f(pPos->x, pPos->y, pPos->z),
-			Vector2f(pTexCoord->x, pTexCoord->y),
-			Vector3f(pNormal->x, pNormal->y, pNormal->z));
+		Vertex v(glm::vec3(pPos->x, pPos->y, pPos->z),
+			glm::vec2(pTexCoord->x, pTexCoord->y),
+			glm::vec3(pNormal->x, pNormal->y, pNormal->z));
 
 		Vertices.push_back(v);
 	}

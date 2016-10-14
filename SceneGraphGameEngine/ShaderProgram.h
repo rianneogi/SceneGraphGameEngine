@@ -42,7 +42,7 @@ public:
 	-None
 	*/
 
-	bool loadProgram(std::string path);
+	bool loadProgram(std::string path, std::string defs = "");
 	/*
 	Pre Condition:
 	-A valid OpenGL context
@@ -122,7 +122,7 @@ protected:
 	-None
 	*/
 
-	GLuint loadShaderFromFile(std::string path, GLenum shaderType);
+	GLuint loadShaderFromFile(std::string path, GLenum shaderType, std::string defs);
 	/*
 	Pre Condition:
 	-None

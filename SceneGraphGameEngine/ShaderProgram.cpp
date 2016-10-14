@@ -8,24 +8,22 @@ ShaderProgram::ShaderProgram()
 
 ShaderProgram::~ShaderProgram()
 {
-	//Free program if it exists
 	freeProgram();
 }
 
 void ShaderProgram::freeProgram()
 {
-	//Delete program
 	glDeleteProgram(mProgramID);
 }
 
 bool ShaderProgram::bind()
 {
-	debugOpengl("binding shader 0");
+	debugOpengl("pre-bind shader");
 
 	//Use shader
 	glUseProgram(mProgramID);
 
-	return debugOpengl("binding shader");
+	return debugOpengl("post-bind shader");
 }
 
 void ShaderProgram::unbind()
@@ -80,19 +78,17 @@ void ShaderProgram::printShaderLog(GLuint shader)
 	{
 		//Shader log length
 		int infoLogLength = 0;
-		int maxLength = infoLogLength;
 
 		//Get info string length
-		glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &maxLength);
-
+		glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &infoLogLength);
 		//Allocate string
-		char* infoLog = new char[maxLength];
+		char* infoLog = new char[infoLogLength];
 
 		//Get info log
-		glGetShaderInfoLog(shader, maxLength, &infoLogLength, infoLog);
-		if (infoLogLength > 0)
+		int len;
+		glGetShaderInfoLog(shader, infoLogLength, &len, infoLog);
+		if (len > 0)
 		{
-			//Print Log
 			printf("%s\n", infoLog);
 			_getch();
 		}
@@ -107,7 +103,7 @@ void ShaderProgram::printShaderLog(GLuint shader)
 	}
 }
 
-GLuint ShaderProgram::loadShaderFromFile(std::string path, GLenum shaderType)
+GLuint ShaderProgram::loadShaderFromFile(std::string path, GLenum shaderType, std::string defs)
 {
 	//Open file
 	GLuint shaderID = 0;
@@ -123,8 +119,19 @@ GLuint ShaderProgram::loadShaderFromFile(std::string path, GLenum shaderType)
 		//Create shader ID
 		shaderID = glCreateShader(shaderType);
 
+		//printf((GLchar*)(defs + shaderString).c_str());
+
 		//Set shader source
-		const GLchar* shaderSource = shaderString.c_str();
+		std::string tmp2 = defs + shaderString;
+		printf(tmp2.c_str());
+		const GLchar* tmp = tmp2.c_str();
+		//printf(tmp);
+		const GLchar* shaderSource = tmp2.c_str();
+		/*const GLchar* def_string = defs.c_str();
+		const GLchar** source = new const GLchar*[2];
+		source[1] = shaderSource;
+		source[2] = def_string;
+		glShaderSource(shaderID, 2, source, NULL);*/
 		glShaderSource(shaderID, 1, (const GLchar**)&shaderSource, NULL);
 
 		//Compile shader source
@@ -151,13 +158,15 @@ GLuint ShaderProgram::loadShaderFromFile(std::string path, GLenum shaderType)
 	return shaderID;
 }
 
-bool ShaderProgram::loadProgram(std::string path)
+bool ShaderProgram::loadProgram(std::string path, std::string defs)
 {
 	//Generate program
 	mProgramID = glCreateProgram();
 
+	printf("creating shader program, id: %d, path: %s\n", mProgramID, path.c_str());
+
 	//Load vertex shader
-	GLuint vertexShader = loadShaderFromFile(path+".glvs", GL_VERTEX_SHADER);
+	GLuint vertexShader = loadShaderFromFile(path+".glvs", GL_VERTEX_SHADER, defs);
 
 	//Check for errors
 	if (vertexShader == 0)
@@ -172,7 +181,7 @@ bool ShaderProgram::loadProgram(std::string path)
 
 
 	//Create fragment shader
-	GLuint fragmentShader = loadShaderFromFile(path+".glfs", GL_FRAGMENT_SHADER);
+	GLuint fragmentShader = loadShaderFromFile(path+".glfs", GL_FRAGMENT_SHADER, defs);
 
 	//Check for errors
 	if (fragmentShader == 0)

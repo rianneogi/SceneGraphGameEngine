@@ -1,23 +1,22 @@
 #pragma once
 
-#include "Texture.h"
+#include "Texture2DArray.h"
 #include "GraphicsTypedefs.h"
 
 struct Vertex
 {
-	Vector3f Pos;
-	Vector2f UV;
-	Vector3f Normal;
-	Vertex(Vector3f p, Vector2f uv, Vector3f n) : Pos(p), UV(uv), Normal(n) {}
+	glm::vec3 Pos;
+	glm::vec2 UV;
+	glm::vec3 Normal;
+	Vertex(glm::vec3 p, glm::vec2 uv, glm::vec3 n) : Pos(p), UV(uv), Normal(n) {}
 };
 
-struct VertexTex3D
+struct VertexTex2DArray
 {
-	Vector3f Pos;
-	Vector3f UV;
-	Vector3f Normal;
-	VertexTex3D(Vector3f p, Vector3f uv, Vector3f n) : Pos(p), UV(uv), Normal(n) {}
-	VertexTex3D(Vector3f p, Vector2f uv, float material, Vector3f n) : Pos(p), UV(uv, material), Normal(n) {}
+	glm::vec3 Pos;
+	glm::vec3 UV;
+	glm::vec3 Normal;
+	VertexTex2DArray(glm::vec3 p, glm::vec3 uv, glm::vec3 n) : Pos(p), UV(uv), Normal(n) {}
 };
 
 //Contains mesh data
@@ -38,13 +37,13 @@ public:
 };
 
 //Contains data of a 3d textured mesh
-class MeshDataTexture3D
+class MeshDataTex2DArray
 {
 public:
-	MeshDataTexture3D();
-	~MeshDataTexture3D();
+	MeshDataTex2DArray();
+	~MeshDataTex2DArray();
 
-	bool init(const std::vector<VertexTex3D>& Vertices, const std::vector<unsigned int>& Indices);
+	bool init(const std::vector<VertexTex2DArray>& Vertices, const std::vector<unsigned int>& Indices);
 	void render();
 	void clear();
 

@@ -5,13 +5,21 @@
 class Terrain
 {
 public:
-	MeshDataTexture3D mMesh;
-	Texture mTexture;
+	MeshDataTex2DArray mMesh;
+	Texture2DArray* mTexture;
+
+	float* mHeightMap;
+	int mLength;
+	int mWidth;
 
 	Terrain();
 	~Terrain();
 
+	glm::vec3 calculateNormal(int x, int z);
+
 	void generate();
 	void render();
+
+	float getHeight(int x, int z);
 };
 

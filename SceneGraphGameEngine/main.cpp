@@ -59,7 +59,7 @@ bool initSDL()
 	//Anti-aliasing
 #ifdef USE_MSAA
 	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
-	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 2);
+	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 8);
 	SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
 #endif
 
@@ -70,6 +70,10 @@ bool initSDL()
 		_getch();
 	}
 	SDL_GL_MakeCurrent(gWindow, gContext);
+
+	int x;
+	SDL_GL_GetAttribute(SDL_GL_MULTISAMPLESAMPLES, &x);
+	printf("BUFFERS: %d\n", x);
 
 #ifdef USE_MSAA
 	glEnable(GL_MULTISAMPLE);
