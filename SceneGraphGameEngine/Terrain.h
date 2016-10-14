@@ -6,7 +6,7 @@ class Terrain
 {
 public:
 	MeshDataTex2DArray mMesh;
-	Texture2DArray* mTexture;
+	TextureArray* mTexture;
 
 	float* mHeightMap;
 	int mLength;

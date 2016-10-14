@@ -240,5 +240,7 @@ int main(int argc, char* args[])
 
 	mainLoop();
 
+	gGame->cleanup();
+
 	return 0;
 }

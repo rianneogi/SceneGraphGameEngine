@@ -42,7 +42,7 @@ void Terrain::generate()
 	{
 		for (int j = 1;j < mWidth+1;j++)
 		{
-			int tex = 3;
+			int tex = rand()%4;
 			//printf("%d %d", i, j);
 			Vertices.push_back(VertexTex2DArray(glm::vec3(i,getHeight(i,j), j), glm::vec3(0, 0, tex), calculateNormal(i,j)));
 			Vertices.push_back(VertexTex2DArray(glm::vec3(i, getHeight(i,j+1), j+1), glm::vec3(0, 1, tex), calculateNormal(i, j+1)));

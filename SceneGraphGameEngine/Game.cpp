@@ -47,8 +47,7 @@ void Game::render(SDL_Window* window)
 	
 	//gTileTextures[0]->bind();
 	//t.bind();
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D_ARRAY, gTerrain3DTexture);
+	gTerrain3DTexture->bind();
 
 	mShaders[0].bind();
 	mShaders[0].setUniformMat4f("M", glm::scale(glm::vec3(1,1,1)));
@@ -164,7 +163,7 @@ void Game::cleanup()
 	{
 		delete gTileTextures[i];
 	}
-	glDeleteTextures(1, &gTerrain3DTexture);
+	delete gTerrain3DTexture;
 }
 
 
