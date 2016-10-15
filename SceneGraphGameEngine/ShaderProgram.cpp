@@ -119,19 +119,9 @@ GLuint ShaderProgram::loadShaderFromFile(std::string path, GLenum shaderType, st
 		//Create shader ID
 		shaderID = glCreateShader(shaderType);
 
-		//printf((GLchar*)(defs + shaderString).c_str());
-
 		//Set shader source
-		std::string tmp2 = defs + shaderString;
-		printf(tmp2.c_str());
-		const GLchar* tmp = tmp2.c_str();
-		//printf(tmp);
-		const GLchar* shaderSource = tmp2.c_str();
-		/*const GLchar* def_string = defs.c_str();
-		const GLchar** source = new const GLchar*[2];
-		source[1] = shaderSource;
-		source[2] = def_string;
-		glShaderSource(shaderID, 2, source, NULL);*/
+		std::string tmp = defs + shaderString;
+		const GLchar* shaderSource = tmp.c_str();
 		glShaderSource(shaderID, 1, (const GLchar**)&shaderSource, NULL);
 
 		//Compile shader source

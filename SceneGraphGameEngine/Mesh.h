@@ -10,6 +10,7 @@ class Mesh
 {
 public:
 	Mesh();
+	Mesh(const std::string& filename);
 
 	~Mesh();
 

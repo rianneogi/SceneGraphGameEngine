@@ -4,6 +4,11 @@ Mesh::Mesh()
 {
 }
 
+Mesh::Mesh(const std::string & filename)
+{
+	loadFromFile(filename);
+}
+
 Mesh::~Mesh()
 {
 	clear();

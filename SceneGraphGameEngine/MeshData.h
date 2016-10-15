@@ -1,6 +1,6 @@
 #pragma once
 
-#include "TextureArray.h"
+#include "FrameBuffer.h"
 #include "GraphicsTypedefs.h"
 
 struct Vertex

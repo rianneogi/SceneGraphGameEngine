@@ -1,7 +1,5 @@
 #pragma once
 
-const float CONST_BLOCKSIZE = 2.f;
-
 struct Vector2i
 {
 	int x, y;

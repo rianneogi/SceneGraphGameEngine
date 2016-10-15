@@ -27,8 +27,8 @@ void Terrain::generate()
 	std::vector<unsigned int> Indices;
 	unsigned int curr_ind = 0;
 
-	mWidth = 100;
-	mLength = 100;
+	mWidth = 1000;
+	mLength = 1000;
 	mHeightMap = new float[(mWidth+2)*(mLength+2)];
 	for (int i = 0;i < mLength+2;i++)
 	{
@@ -38,25 +38,28 @@ void Terrain::generate()
 		}
 	}
 
-	for (int i = 1;i < mLength+1;i++)
+	for (int i = 0;i < mLength;i++)
 	{
-		for (int j = 1;j < mWidth+1;j++)
+		for (int j = 0;j < mWidth;j++)
 		{
-			int tex = rand()%4;
-			//printf("%d %d", i, j);
-			Vertices.push_back(VertexTex2DArray(glm::vec3(i,getHeight(i,j), j), glm::vec3(0, 0, tex), calculateNormal(i,j)));
-			Vertices.push_back(VertexTex2DArray(glm::vec3(i, getHeight(i,j+1), j+1), glm::vec3(0, 1, tex), calculateNormal(i, j+1)));
-			Vertices.push_back(VertexTex2DArray(glm::vec3(i+1, getHeight(i+1, j), j), glm::vec3(1, 0, tex), calculateNormal(i+1, j)));
-			Vertices.push_back(VertexTex2DArray(glm::vec3(i+1, getHeight(i+1, j + 1), j+1), glm::vec3(1, 1, tex), calculateNormal(i+1, j+1)));
+			int tex = rand() % 4;
+			Vertices.push_back(VertexTex2DArray(glm::vec3(i, getHeight(i, j), j), glm::vec3(i, j, tex), calculateNormal(i+1, j+1)));
+		}
+	}
 
+	for (int i = 0;i < mLength-1;i++)
+	{
+		for (int j = 0;j < mWidth-1;j++)
+		{
+			curr_ind = i*mWidth + j;
 			Indices.push_back(curr_ind);
 			Indices.push_back(curr_ind+1);
-			Indices.push_back(curr_ind+2);
-			Indices.push_back(curr_ind+3);
-			Indices.push_back(curr_ind+2);
+			Indices.push_back(curr_ind+mWidth);
+			Indices.push_back(curr_ind + mWidth + 1);
+			Indices.push_back(curr_ind + mWidth);
 			Indices.push_back(curr_ind+1);
 
-			curr_ind += 4;
+			//curr_ind += 1;
 		}
 	}
 

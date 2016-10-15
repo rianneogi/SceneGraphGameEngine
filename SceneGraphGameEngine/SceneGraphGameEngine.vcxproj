@@ -116,6 +116,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="CubeMapTexture.h" />
+    <ClInclude Include="FrameBuffer.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameComponent.h" />
     <ClInclude Include="GameObject.h" />
@@ -127,13 +129,17 @@
     <ClInclude Include="MeshRenderer.h" />
     <ClInclude Include="Model.h" />
     <ClInclude Include="ShaderProgram.h" />
+    <ClInclude Include="SkyBox.h" />
     <ClInclude Include="Terrain.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="TextureArray.h" />
     <ClInclude Include="Timer.h" />
+    <ClInclude Include="Water.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="CubeMapTexture.cpp" />
+    <ClCompile Include="FrameBuffer.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameComponent.cpp" />
     <ClCompile Include="GameObject.cpp" />
@@ -145,10 +151,12 @@
     <ClCompile Include="MeshRenderer.cpp" />
     <ClCompile Include="Model.cpp" />
     <ClCompile Include="ShaderProgram.cpp" />
+    <ClCompile Include="SkyBox.cpp" />
     <ClCompile Include="Terrain.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="TextureArray.cpp" />
     <ClCompile Include="Timer.cpp" />
+    <ClCompile Include="Water.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Shaders\basic.glfs" />
@@ -161,6 +169,8 @@
     <None Include="Resources\Shaders\forward_point.glvs" />
     <None Include="Resources\Shaders\phong.glfs" />
     <None Include="Resources\Shaders\phong.glvs" />
+    <None Include="Resources\Shaders\skybox.glfs" />
+    <None Include="Resources\Shaders\skybox.glvs" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

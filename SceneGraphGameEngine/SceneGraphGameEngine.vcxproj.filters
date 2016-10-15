@@ -15,6 +15,7 @@
     </Filter>
     <Filter Include="Source Files\Shaders">
       <UniqueIdentifier>{16d9efd7-a7a2-4698-82d4-4beeb90c745e}</UniqueIdentifier>
+      <Extensions>glfs;glvs</Extensions>
     </Filter>
     <Filter Include="Source Files\Components">
       <UniqueIdentifier>{f17a1a28-441e-4b09-976b-e8ec0be2cc18}</UniqueIdentifier>
@@ -75,6 +76,18 @@
     <ClInclude Include="TextureArray.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="FrameBuffer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Water.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SkyBox.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CubeMapTexture.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GraphicsInclude.cpp">
@@ -125,6 +138,18 @@
     <ClCompile Include="TextureArray.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="FrameBuffer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Water.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SkyBox.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CubeMapTexture.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Shaders\basic.glfs">
@@ -155,6 +180,12 @@
       <Filter>Source Files\Shaders</Filter>
     </None>
     <None Include="Resources\Shaders\forward_directional.glvs">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="Resources\Shaders\skybox.glfs">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="Resources\Shaders\skybox.glvs">
       <Filter>Source Files\Shaders</Filter>
     </None>
   </ItemGroup>
