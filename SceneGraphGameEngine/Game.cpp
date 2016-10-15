@@ -39,6 +39,9 @@ bool Game::init()
 	loadTextures();
 
 	mMeshes.push_back(new Mesh("Resources//Models//cube2.obj"));
+	mMeshes.push_back(new Mesh("Resources//Models//alduin.obj"));
+
+	mTextures.push_back(new Texture("Resources//Textures//alduin.jpg"));
 
 	mSkyTexture = new CubeMapTexture();
 	mSkyTexture->loadRepeated("Resources//Textures//alduin.jpg");
@@ -51,13 +54,12 @@ bool Game::init()
 
 	//m.loadFromFile("Resources//Models//uvsphere_highres.obj");
 	//t.loadFromFile("Resources//Textures//sky.png");
-	mShaders.push_back(new ShaderProgram("Resources//Shaders//forward_ambient", "#define MULTI_TEXTURE\n"));
-	mShaders.push_back(new ShaderProgram("Resources//Shaders//forward_directional", "#define MULTI_TEXTURE\n"));
-	mShaders.push_back(new ShaderProgram("Resources//Shaders//forward_point", "#define MULTI_TEXTURE\n"));
+	mShaders.push_back(new ShaderProgram("Resources//Shaders//forward_ambient", "#define MULTI_TEXTURE\n#define SOLID_COLOR\n"));
+	mShaders.push_back(new ShaderProgram("Resources//Shaders//forward_directional", "#define MULTI_TEXTURE\n#define SOLID_COLOR\n"));
+	mShaders.push_back(new ShaderProgram("Resources//Shaders//forward_point", "#define MULTI_TEXTURE\n#define SOLID_COLOR\n"));
 	mShaders.push_back(new ShaderProgram("Resources//Shaders//skybox"));
 	
 	mShaders[1]->bind();
-	printf("inti done\n");
 	mShaders[1]->setUniformVec3f("gLight.dir", glm::vec3(-1, -1, 1));
 	mShaders[1]->setUniformFloat("gLight.intensity", 1);
 	mShaders[1]->setUniformVec3f("gLight.color", glm::vec3(1, 1, 1));
@@ -67,10 +69,8 @@ bool Game::init()
 	mShaders[2]->setUniformFloat("gLight.intensity", 500);
 	mShaders[2]->setUniformVec3f("gLight.color", glm::vec3(1, 1, 0));
 
-	mShaders[3]->bind();
-	mShaders[3]->setUniformVec3f("gSkyColor", glm::vec3(0, 0, 1));
-
-	
+	//mShaders[3]->bind();
+	//mShaders[3]->setUniformVec3f("gSkyColor", glm::vec3(0, 0, 1));
 
 	return true;
 }
@@ -96,6 +96,7 @@ void Game::render(SDL_Window* window)
 	glCullFace(GL_BACK);
 
 	gTerrain3DTexture->bind();
+	mTextures[0]->bind();
 
 	mShaders[0]->bind();
 	mShaders[0]->setUniformMat4f("M", glm::scale(glm::vec3(1,1,1)));
@@ -103,6 +104,7 @@ void Game::render(SDL_Window* window)
 	mShaders[0]->setUniformMat4f("P", projection);
 	
 	mTerrain->render();
+	mMeshes[1]->render();
 
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_ONE, GL_ONE);
@@ -115,6 +117,7 @@ void Game::render(SDL_Window* window)
 	mShaders[1]->setUniformMat4f("gProjectionMat", projection);
 	mShaders[1]->setUniformVec3f("gEyePos", mCamera.mPosition);
 	mTerrain->render();
+	mMeshes[1]->render();
 
 	/*mShaders[2].bind();
 	mShaders[2].setUniformMat4f("gModelMat", glm::scale(glm::vec3(1, 1, 1)));

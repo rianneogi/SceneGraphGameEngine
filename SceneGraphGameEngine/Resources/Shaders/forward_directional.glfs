@@ -2,6 +2,8 @@
  
 #ifdef MULTI_TEXTURE
 in vec3 UV;
+#elif defined(SOLID_COLOR)
+in vec3 UV;
 #else
 in vec2 UV;
 #endif
@@ -44,5 +46,9 @@ void main()
 
 	vec3 res = gLight.intensity*gLight.color*(diffuseVector + specularVector);
 
-    color = vec4(res,1.0)*texture( textureSampler, UV );
+    #ifdef SOLID_COLOR
+    color = vec4(res,1.0)*vec4(UV,1.0);
+	#else
+	color = vec4(res,1.0)*texture( textureSampler, UV );
+	#endif
 }

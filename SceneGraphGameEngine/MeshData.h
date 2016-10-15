@@ -19,6 +19,14 @@ struct VertexTex2DArray
 	VertexTex2DArray(glm::vec3 p, glm::vec3 uv, glm::vec3 n) : Pos(p), UV(uv), Normal(n) {}
 };
 
+struct VertexSolidColor
+{
+	glm::vec3 Pos;
+	glm::vec3 Color;
+	glm::vec3 Normal;
+	VertexSolidColor(glm::vec3 p, glm::vec3 col, glm::vec3 n) : Pos(p), Color(col), Normal(n) {}
+};
+
 //Contains mesh data
 class MeshData
 {
@@ -36,7 +44,7 @@ public:
 	unsigned int MaterialIndex;
 };
 
-//Contains data of a 3d textured mesh
+//Contains data of an array textured mesh
 class MeshDataTex2DArray
 {
 public:
@@ -44,6 +52,23 @@ public:
 	~MeshDataTex2DArray();
 
 	bool init(const std::vector<VertexTex2DArray>& Vertices, const std::vector<unsigned int>& Indices);
+	void render();
+	void clear();
+
+	GLuint VB;
+	GLuint IB;
+	unsigned int NumIndices;
+	unsigned int MaterialIndex;
+};
+
+//Contains data of a solid-colored mesh
+class MeshDataSolidColor
+{
+public:
+	MeshDataSolidColor();
+	~MeshDataSolidColor();
+
+	bool init(const std::vector<VertexSolidColor>& Vertices, const std::vector<unsigned int>& Indices);
 	void render();
 	void clear();
 

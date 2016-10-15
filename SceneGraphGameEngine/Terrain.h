@@ -5,7 +5,7 @@
 class Terrain
 {
 public:
-	MeshDataTex2DArray mMesh;
+	MeshDataSolidColor* mMesh;
 	TextureArray* mTexture;
 
 	float* mHeightMap;

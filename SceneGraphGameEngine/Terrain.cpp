@@ -3,11 +3,12 @@
 Terrain::Terrain()
 {
 	mTexture = NULL;
-	//mMesh = NULL;
+	mMesh = NULL;
 }
 
 Terrain::~Terrain()
 {
+	delete mMesh;
 }
 
 glm::vec3 Terrain::calculateNormal(int x, int z)
@@ -32,7 +33,8 @@ float perlinOctaves(float i, float j)
 
 void Terrain::generate()
 {
-	std::vector<VertexTex2DArray> Vertices;
+	mMesh = new MeshDataSolidColor();
+	std::vector<VertexSolidColor> Vertices;
 	std::vector<unsigned int> Indices;
 	unsigned int curr_ind = 0;
 
@@ -47,14 +49,22 @@ void Terrain::generate()
 		}
 	}
 
+	glm::vec3* colors = new glm::vec3[4];
+	colors[0] = glm::vec3(196 / 255.0, 212 / 255.0, 170 / 255.0);
+	colors[1] = glm::vec3(221/255.0, 221/255.0, 187/255.0);
+	colors[2] = glm::vec3(233/255.0, 221/255.0, 199/255.0);
+	colors[3] = glm::vec3(156/255.0, 187/255.0, 169/255.0);
+
 	for (int i = 0;i < mLength;i++)
 	{
 		for (int j = 0;j < mWidth;j++)
 		{
 			int tex = rand() % 4;
-			Vertices.push_back(VertexTex2DArray(glm::vec3(i, getHeight(i, j), j), glm::vec3(i, j, tex), calculateNormal(i+1, j+1)));
+			Vertices.push_back(VertexSolidColor(glm::vec3(i, getHeight(i, j), j), colors[tex], calculateNormal(i+1, j+1)));
 		}
 	}
+
+	delete[] colors;
 
 	for (int i = 0;i < mLength-1;i++)
 	{
@@ -70,10 +80,10 @@ void Terrain::generate()
 		}
 	}
 
-	mMesh.init(Vertices, Indices);
+	mMesh->init(Vertices, Indices);
 }
 
 void Terrain::render()
 {
-	mMesh.render();
+	mMesh->render();
 }

@@ -4,12 +4,17 @@ in vec3 TexCoord0;
 
 out vec4 FragColor;
 
-uniform samplerCube gCubemapTexture;
+#ifdef FIXED_COLOR
 uniform vec3 gSkyColor;
+#else
+uniform samplerCube gCubemapTexture;
+#endif
 
 void main()
 {
-    //todo - make this work with any texture
+	#ifdef FIXED_COLOR
+	FragColor = vec4(gSkyColor,1);
+	#else
     FragColor = texture(gCubemapTexture, TexCoord0);
-    //FragColor = vec4(gSkyColor,1);
+	#endif
 }
