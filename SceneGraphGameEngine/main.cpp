@@ -240,7 +240,7 @@ int main(int argc, char* args[])
 
 	mainLoop();
 
-	gGame->cleanup();
+	delete gGame;
 
 	return 0;
 }

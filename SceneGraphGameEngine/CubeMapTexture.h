@@ -14,7 +14,8 @@ public:
 	bool loadRepeated(const std::string& Filename);
 	void bind();
 	void bind(GLenum TextureUnit);
+	void freeTexture();
 
-	GLuint mTextureObj;
+	GLuint mTextureID;
 };
 

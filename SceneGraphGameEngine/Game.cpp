@@ -5,36 +5,72 @@ float gMouseSpeed = 0.0075f;
 
 Game::Game()
 {
+	mSkyTexture = NULL;
+	mSkybox = NULL;
+	mTerrain = NULL;
 }
+
 
 Game::~Game()
 {
+	for (int i = 0;i < gTileTextures.size();i++)
+	{
+		delete gTileTextures[i];
+	}
+	for (int i = 0;i < mMeshes.size();i++)
+	{
+		delete mMeshes[i];
+	}
+	for (int i = 0;i < mTextures.size();i++)
+	{
+		delete mTextures[i];
+	}
+	for (int i = 0;i < mShaders.size();i++)
+	{
+		delete mShaders[i];
+	}
+	delete mTerrain;
+	delete gTerrain3DTexture;
+	delete mSkyTexture;
 }
 
 bool Game::init()
 {
 	loadTextures();
+
+	mMeshes.push_back(new Mesh("Resources//Models//cube2.obj"));
+
+	mSkyTexture = new CubeMapTexture();
+	mSkyTexture->loadRepeated("Resources//Textures//alduin.jpg");
+
+	mSkybox = new SkyBox(mMeshes[0], mSkyTexture);
 	mCamera.setPosition(glm::vec3(0, 0, 0));
-	mTerrain.generate();
-	m.loadFromFile("Resources//Models//uvsphere_highres.obj");
-	t.loadFromFile("Resources//Textures//sky.png");
-	mShaders.push_back(ShaderProgram());
-	mShaders.push_back(ShaderProgram());
-	mShaders.push_back(ShaderProgram());
-	mShaders[0].loadProgram("Resources//Shaders//forward_ambient", "#define MULTI_TEXTURE\n");
-	mShaders[1].loadProgram("Resources//Shaders//forward_directional", "#define MULTI_TEXTURE\n");
-	mShaders[2].loadProgram("Resources//Shaders//forward_point", "#define MULTI_TEXTURE\n");
 
-	mShaders[1].bind();
+	mTerrain = new Terrain();
+	mTerrain->generate();
 
-	mShaders[1].setUniformVec3f("gLight.dir", glm::vec3(-1, -1, 1));
-	mShaders[1].setUniformFloat("gLight.intensity", 1);
-	mShaders[1].setUniformVec3f("gLight.color", glm::vec3(1, 1, 1));
+	//m.loadFromFile("Resources//Models//uvsphere_highres.obj");
+	//t.loadFromFile("Resources//Textures//sky.png");
+	mShaders.push_back(new ShaderProgram("Resources//Shaders//forward_ambient", "#define MULTI_TEXTURE\n"));
+	mShaders.push_back(new ShaderProgram("Resources//Shaders//forward_directional", "#define MULTI_TEXTURE\n"));
+	mShaders.push_back(new ShaderProgram("Resources//Shaders//forward_point", "#define MULTI_TEXTURE\n"));
+	mShaders.push_back(new ShaderProgram("Resources//Shaders//skybox"));
+	
+	mShaders[1]->bind();
+	printf("inti done\n");
+	mShaders[1]->setUniformVec3f("gLight.dir", glm::vec3(-1, -1, 1));
+	mShaders[1]->setUniformFloat("gLight.intensity", 1);
+	mShaders[1]->setUniformVec3f("gLight.color", glm::vec3(1, 1, 1));
+	
+	mShaders[2]->bind();
+	mShaders[2]->setUniformVec3f("gLight.pos", mCamera.mPosition);
+	mShaders[2]->setUniformFloat("gLight.intensity", 500);
+	mShaders[2]->setUniformVec3f("gLight.color", glm::vec3(1, 1, 0));
 
-	mShaders[2].bind();
-	mShaders[2].setUniformVec3f("gLight.pos", mCamera.mPosition);
-	mShaders[2].setUniformFloat("gLight.intensity", 500);
-	mShaders[2].setUniformVec3f("gLight.color", glm::vec3(1, 1, 0));
+	mShaders[3]->bind();
+	mShaders[3]->setUniformVec3f("gSkyColor", glm::vec3(0, 0, 1));
+
+	
 
 	return true;
 }
@@ -42,31 +78,43 @@ bool Game::init()
 void Game::render(SDL_Window* window)
 {
 	glm::mat4 model, view, projection;
-
 	mCamera.render(view, projection);
-	
-	//gTileTextures[0]->bind();
-	//t.bind();
+
+	glDepthMask(true);
+	glDisable(GL_BLEND);
+
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glCullFace(GL_FRONT);
+	glDepthFunc(GL_LEQUAL);
+	mShaders[3]->bind();
+	mShaders[3]->setUniformMat4f("gModelMat", glm::translate(glm::mat4(1.0), mCamera.mPosition));
+	mShaders[3]->setUniformMat4f("gViewMat", view);
+	mShaders[3]->setUniformMat4f("gProjectionMat", projection);
+	mSkybox->render();
+
+	glDepthFunc(GL_LESS);
+	glCullFace(GL_BACK);
+
 	gTerrain3DTexture->bind();
 
-	mShaders[0].bind();
-	mShaders[0].setUniformMat4f("M", glm::scale(glm::vec3(1,1,1)));
-	mShaders[0].setUniformMat4f("V", view);
-	mShaders[0].setUniformMat4f("P", projection);
+	mShaders[0]->bind();
+	mShaders[0]->setUniformMat4f("M", glm::scale(glm::vec3(1,1,1)));
+	mShaders[0]->setUniformMat4f("V", view);
+	mShaders[0]->setUniformMat4f("P", projection);
 	
-	mTerrain.render();
+	mTerrain->render();
 
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_ONE, GL_ONE);
 	glDepthMask(false);
 	glDepthFunc(GL_EQUAL);
 
-	mShaders[1].bind();
-	mShaders[1].setUniformMat4f("gModelMat", glm::scale(glm::vec3(1, 1, 1)));
-	mShaders[1].setUniformMat4f("gViewMat", view);
-	mShaders[1].setUniformMat4f("gProjectionMat", projection);
-	mShaders[1].setUniformVec3f("gEyePos", mCamera.mPosition);
-	mTerrain.render();
+	mShaders[1]->bind();
+	mShaders[1]->setUniformMat4f("gModelMat", glm::scale(glm::vec3(1, 1, 1)));
+	mShaders[1]->setUniformMat4f("gViewMat", view);
+	mShaders[1]->setUniformMat4f("gProjectionMat", projection);
+	mShaders[1]->setUniformVec3f("gEyePos", mCamera.mPosition);
+	mTerrain->render();
 
 	/*mShaders[2].bind();
 	mShaders[2].setUniformMat4f("gModelMat", glm::scale(glm::vec3(1, 1, 1)));
@@ -75,10 +123,6 @@ void Game::render(SDL_Window* window)
 	mShaders[2].setUniformVec3f("gEyePos", mCamera.mPosition);
 	mShaders[2].setUniformVec3f("gLight.pos", mCamera.mPosition);
 	mTerrain.render();*/
-
-	glDepthMask(true);
-	glDisable(GL_BLEND);
-	glDepthFunc(GL_LESS);
 }
 
 void Game::update(int deltaTime)
@@ -155,15 +199,6 @@ void Game::handleEvent(SDL_Event e, int deltaTime)
 	gCamera.FoV = std::max(30.f,std::min(60.f, gCamera.FoV-e.mouseWheel.delta));
 	}*/
 	//mCamera.update();
-}
-
-void Game::cleanup()
-{
-	for (int i = 0;i < gTileTextures.size();i++)
-	{
-		delete gTileTextures[i];
-	}
-	delete gTerrain3DTexture;
 }
 
 

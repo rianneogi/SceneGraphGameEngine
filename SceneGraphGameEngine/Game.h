@@ -9,11 +9,13 @@ public:
 	~Game();
 
 	Camera mCamera;
+	SkyBox* mSkybox;
 
-	std::vector<ShaderProgram> mShaders;
-	Terrain mTerrain;
-	Texture t;
-	Mesh m;
+	std::vector<ShaderProgram*> mShaders;
+	Terrain* mTerrain;
+	std::vector<Texture*> mTextures;
+	CubeMapTexture* mSkyTexture;
+	std::vector<Mesh*> mMeshes;
 
 	bool init();
 	void cleanup();

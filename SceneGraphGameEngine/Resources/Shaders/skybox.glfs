@@ -10,6 +10,6 @@ uniform vec3 gSkyColor;
 void main()
 {
     //todo - make this work with any texture
-    //FragColor = texture(gCubemapTexture, TexCoord0);
-    FragColor = vec4(gSkyColor,1);
+    FragColor = texture(gCubemapTexture, TexCoord0);
+    //FragColor = vec4(gSkyColor,1);
 }

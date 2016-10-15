@@ -14,7 +14,6 @@ public:
 	void bind(GLenum textureunit);
 	void unbind();
 
-	//sf::Texture mTex;
 	GLuint mTextureID;
 	unsigned int mWidth;
 	unsigned int mHeight;

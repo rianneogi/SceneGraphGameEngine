@@ -3,6 +3,16 @@
 Texture::Texture()
 {
 	mTextureID = 0;
+	mTextureWidth = 0;
+	mTextureHeight = 0;
+}
+
+Texture::Texture(std::string file)
+{
+	mTextureID = 0;
+	mTextureWidth = 0;
+	mTextureHeight = 0;
+	loadFromFile(file);
 }
 
 Texture::~Texture()

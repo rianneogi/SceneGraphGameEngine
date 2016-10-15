@@ -8,6 +8,7 @@ class Texture
 {
 public:
 	Texture();
+	Texture(std::string file);
 	~Texture();
 
 	bool loadFromFile(std::string path);
@@ -17,7 +18,6 @@ public:
 	void bind(GLenum textureunit);
 	void unbind();
 
-	//sf::Texture mTex;
 	GLuint mTextureID;
 	unsigned int mTextureWidth;
 	unsigned int mTextureHeight;

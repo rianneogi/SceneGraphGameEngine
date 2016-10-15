@@ -21,20 +21,29 @@ float Terrain::getHeight(int x, int z)
 	return mHeightMap[x*mWidth + z];
 }
 
+float perlinOctaves(float i, float j)
+{
+	float res = 5*glm::perlin(glm::vec2(i / 20.0, j / 20.0));
+	res += 10 * glm::perlin(glm::vec2(i / 40.0, j / 40.0));
+	res += 20 * glm::perlin(glm::vec2(i / 80.0, j / 80.0));
+	res += 40 * glm::perlin(glm::vec2(i / 160.0, j / 160.0));
+	return res;
+}
+
 void Terrain::generate()
 {
 	std::vector<VertexTex2DArray> Vertices;
 	std::vector<unsigned int> Indices;
 	unsigned int curr_ind = 0;
 
-	mWidth = 1000;
-	mLength = 1000;
+	mWidth = 500;
+	mLength = 500;
 	mHeightMap = new float[(mWidth+2)*(mLength+2)];
 	for (int i = 0;i < mLength+2;i++)
 	{
 		for (int j = 0;j < mWidth+2;j++)
 		{
-			mHeightMap[i * mWidth + j] = 5 * glm::perlin(glm::vec2(i / 10.0, j / 10.0));
+			mHeightMap[i * mWidth + j] = perlinOctaves(i,j);
 		}
 	}
 
@@ -54,33 +63,12 @@ void Terrain::generate()
 			curr_ind = i*mWidth + j;
 			Indices.push_back(curr_ind);
 			Indices.push_back(curr_ind+1);
-			Indices.push_back(curr_ind+mWidth);
+			Indices.push_back(curr_ind + mWidth);
 			Indices.push_back(curr_ind + mWidth + 1);
 			Indices.push_back(curr_ind + mWidth);
 			Indices.push_back(curr_ind+1);
-
-			//curr_ind += 1;
 		}
 	}
-
-	//post-processing
-	/*for (int i = 0;i < Vertices.size();i++)
-	{
-		for (int j = i + 1;j < Vertices.size();j++)
-		{
-			if (Vertices[i].Pos == Vertices[j].Pos && Vertices[i].UV == Vertices[j].UV && Vertices[i].Normal == Vertices[j].Normal)
-			{
-				for (int k = 0;k < Indices.size();k++)
-				{
-					if (Indices[k] == j)
-					{
-						Indices[k] = i;
-					}
-				}
-				Vertices.erase(Vertices.begin() + j);
-			}
-		}
-	}*/
 
 	mMesh.init(Vertices, Indices);
 }

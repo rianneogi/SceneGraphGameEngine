@@ -6,6 +6,18 @@ ShaderProgram::ShaderProgram()
 	mProgramID = NULL;
 }
 
+ShaderProgram::ShaderProgram(std::string path)
+{
+	mProgramID = NULL;
+	loadProgram(path);
+}
+
+ShaderProgram::ShaderProgram(std::string path, std::string defs)
+{
+	mProgramID = NULL;
+	loadProgram(path, defs);
+}
+
 ShaderProgram::~ShaderProgram()
 {
 	freeProgram();
@@ -13,22 +25,22 @@ ShaderProgram::~ShaderProgram()
 
 void ShaderProgram::freeProgram()
 {
-	glDeleteProgram(mProgramID);
+	if (mProgramID != NULL)
+	{
+		glDeleteProgram(mProgramID);
+		debugOpengl("delete shader error");
+	}
 }
 
 bool ShaderProgram::bind()
 {
 	debugOpengl("pre-bind shader");
-
-	//Use shader
 	glUseProgram(mProgramID);
-
 	return debugOpengl("post-bind shader");
 }
 
 void ShaderProgram::unbind()
 {
-	//Use default program
 	glUseProgram(NULL);
 }
 
@@ -150,10 +162,13 @@ GLuint ShaderProgram::loadShaderFromFile(std::string path, GLenum shaderType, st
 
 bool ShaderProgram::loadProgram(std::string path, std::string defs)
 {
+	freeProgram();
+	
 	//Generate program
 	mProgramID = glCreateProgram();
 
 	printf("creating shader program, id: %d, path: %s\n", mProgramID, path.c_str());
+	
 
 	//Load vertex shader
 	GLuint vertexShader = loadShaderFromFile(path+".glvs", GL_VERTEX_SHADER, defs);
@@ -205,6 +220,8 @@ bool ShaderProgram::loadProgram(std::string path, std::string defs)
 	//Clean up excess shader references
 	glDeleteShader(vertexShader);
 	glDeleteShader(fragmentShader);
+
+	debugOpengl("Loading shader error");
 
 	return true;
 }
