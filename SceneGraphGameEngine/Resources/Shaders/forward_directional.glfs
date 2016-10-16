@@ -33,7 +33,7 @@ void main()
     float cosTheta = clamp( dot( fragNormal,-gLight.dir ), 0,1 );
 		
 	vec3 diffuseVector = vec3(cosTheta,cosTheta,cosTheta);
-		
+	
 	vec3 vertexPosition_worldspace = (gModelMat*vec4(fragPos,1)).xyz;
 	vec3 eyeVector = normalize(gEyePos-vertexPosition_worldspace);
 	vec3 reflection = normalize(reflect(gLight.dir,fragNormal));

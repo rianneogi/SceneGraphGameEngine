@@ -11,12 +11,12 @@ struct Vertex
 	Vertex(glm::vec3 p, glm::vec2 uv, glm::vec3 n) : Pos(p), UV(uv), Normal(n) {}
 };
 
-struct VertexTex2DArray
+struct VertexTexArray
 {
 	glm::vec3 Pos;
 	glm::vec3 UV;
 	glm::vec3 Normal;
-	VertexTex2DArray(glm::vec3 p, glm::vec3 uv, glm::vec3 n) : Pos(p), UV(uv), Normal(n) {}
+	VertexTexArray(glm::vec3 p, glm::vec3 uv, glm::vec3 n) : Pos(p), UV(uv), Normal(n) {}
 };
 
 struct VertexSolidColor
@@ -45,13 +45,13 @@ public:
 };
 
 //Contains data of an array textured mesh
-class MeshDataTex2DArray
+class MeshDataTexArray
 {
 public:
-	MeshDataTex2DArray();
-	~MeshDataTex2DArray();
+	MeshDataTexArray();
+	~MeshDataTexArray();
 
-	bool init(const std::vector<VertexTex2DArray>& Vertices, const std::vector<unsigned int>& Indices);
+	bool init(const std::vector<VertexTexArray>& Vertices, const std::vector<unsigned int>& Indices);
 	void render();
 	void clear();
 

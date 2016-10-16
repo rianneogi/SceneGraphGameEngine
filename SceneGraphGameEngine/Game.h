@@ -14,8 +14,12 @@ public:
 	std::vector<ShaderProgram*> mShaders;
 	Terrain* mTerrain;
 	std::vector<Texture*> mTextures;
-	CubeMapTexture* mSkyTexture;
+	CubeMapTexture* mDayTexture;
+	CubeMapTexture* mNightTexture;
 	std::vector<Mesh*> mMeshes;
+	FrameBuffer mShadowFBO;
+
+	std::vector<glm::mat4> mEntities;
 
 	bool init();
 	void cleanup();

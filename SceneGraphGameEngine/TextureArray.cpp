@@ -61,10 +61,31 @@ bool TextureArray::loadFromFile(std::vector<Texture*> textures, unsigned int wid
 		glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, i, mWidth, mHeight, 1, GL_RGBA, GL_UNSIGNED_BYTE, &texels[mBytesPerTexel*mWidth*mHeight*i]);
 	}
 
+	//Parameters
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_LOD_BIAS, 0);
+
+	//Mipmaps
+	glGenerateMipmap(GL_TEXTURE_2D_ARRAY);
+
+	//Anisotropic Filtering
+	if (GLEW_EXT_texture_filter_anisotropic)
+	{
+		float amount = 0;
+		glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &amount);
+		if (amount > 4)
+		{
+			amount = 4;
+		}
+		glTexParameterf(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAX_ANISOTROPY_EXT, amount);
+	}
+	else
+	{
+		printf("texture filter anisotropic not supported\n");
+	}
 	//glGenerateMipmap(GL_TEXTURE_2D_ARRAY);
 
 	free(texels);
