@@ -16,10 +16,22 @@ Water::Water(Mesh* mesh)
 	mRefractionFBO.createDepthTextureAttachment();
 	mRefractionFBO.checkStatus();
 	mRefractionFBO.unbind();
+
+	mWaveSpeed = 0.000025f;
+	mDuDvOffset = 0.f;
 }
 
 Water::~Water()
 {
+}
+
+void Water::update(int deltaTime)
+{
+	mDuDvOffset += deltaTime*mWaveSpeed;
+	if (mDuDvOffset > 1.0f)
+	{
+		mDuDvOffset -= 1.0f;
+	}
 }
 
 void Water::render()

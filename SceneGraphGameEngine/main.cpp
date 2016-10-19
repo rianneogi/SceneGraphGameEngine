@@ -2,7 +2,7 @@
 
 #include "Game.h"
 
-//#define USE_VSYNC
+#define USE_VSYNC
 //#define USE_MSAA
 
 Game* gGame = NULL;

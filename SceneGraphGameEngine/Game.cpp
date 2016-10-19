@@ -56,6 +56,7 @@ bool Game::init()
 
 	mTextures.push_back(new Texture("Resources//Textures//alduin.jpg"));
 	mTextures.push_back(new Texture("Resources//Textures//alduin_n.jpg"));
+	mTextures.push_back(new Texture("Resources//Textures//Water//waterDUDV.png"));
 	
 	mDayTexture = new CubeMapTexture();
 	mDayTexture->load("Resources//Textures//skybox//right.png", "Resources//Textures//skybox//left.png", "Resources//Textures//skybox//top.png",
@@ -74,7 +75,7 @@ bool Game::init()
 	mShaders.push_back(new ShaderProgram("Resources//Shaders//forward_ambient", "#define NORMAL_MAP\n"));
 	mShaders.push_back(new ShaderProgram("Resources//Shaders//forward_directional", "#define NORMAL_MAP\n"));
 	mShaders.push_back(new ShaderProgram("Resources//Shaders//forward_point", "#define NORMAL_MAP\n"));
-	mShaders.push_back(new ShaderProgram("Resources//Shaders//water", "#define FIXED_COLOR\n"));
+	mShaders.push_back(new ShaderProgram("Resources//Shaders//water"));
 	
 	mShaders[1]->bind();
 	mShaders[1]->setUniformVec3f("gLight.dir", glm::vec3(-1, -1, 1));
@@ -108,11 +109,17 @@ bool Game::init()
 
 	mShaders[10]->bind();
 	mShaders[10]->setUniformVec3f("gColor", glm::vec3(0.5, 0.5, 1.0));
+	mShaders[10]->setUniformFloat("gWaveStrength", 0.01);
+	mShaders[10]->setTextureLocation("gReflectionTexture", 0);
+	mShaders[10]->setTextureLocation("gRefractionTexture", 1);
+	mShaders[10]->setTextureLocation("gDuDv", 2);
 
-	GLuint t1Location = glGetUniformLocation(mShaders[10]->getProgramID(), "gReflectionTexture");
+	/*GLuint t1Location = glGetUniformLocation(mShaders[10]->getProgramID(), "gReflectionTexture");
 	GLuint t2Location = glGetUniformLocation(mShaders[10]->getProgramID(), "gRefractionTexture");
+	GLuint t3Location = glGetUniformLocation(mShaders[10]->getProgramID(), "gDuDv");
 	glUniform1i(t1Location, 0);
 	glUniform1i(t2Location, 1);
+	glUniform1i(t3Location, 2);*/
 
 	//mShaders[3]->bind();
 	//mShaders[3]->setUniformVec3f("gSkyColor", glm::vec3(0, 0, 1));
@@ -122,8 +129,8 @@ bool Game::init()
 
 	for (int i = 0;i < 50;i++)
 	{
-		float x = rand() % 64;
-		float z = rand() % 64;
+		float x = rand() % 320;
+		float z = rand() % 320;
 		float y = mTerrain->getHeight(x, z);
 		mEntities.push_back(glm::translate(glm::mat4(1.0), glm::vec3(x, y, z)));
 	}
@@ -259,17 +266,21 @@ void Game::render(SDL_Window* window)
 	glBindTexture(GL_TEXTURE_2D, mWater->mReflectionFBO.mColorTexture);
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, mWater->mRefractionFBO.mColorTexture);
+	mTextures[2]->bind(GL_TEXTURE2);
 	
 	mShaders[10]->bind();
-	mShaders[10]->setUniformMat4f("gModelMat", glm::scale(glm::vec3(160, 160, 160)));
+	mShaders[10]->setUniformMat4f("gModelMat", glm::translate(glm::scale(glm::vec3(160, 160, 160)), glm::vec3(1,0,1)));
 	mShaders[10]->setUniformMat4f("gViewMat", view);
 	mShaders[10]->setUniformMat4f("gProjectionMat", projection);
+	mShaders[10]->setUniformFloat("gDuDvOffset", mWater->mDuDvOffset);
+	mShaders[10]->setUniformVec3f("gEyePos", mCamera.mPosition);
 	mWater->render();
 }
 
 void Game::update(int deltaTime)
 {
 	mCamera.update();
+	mWater->update(deltaTime);
 }
 
 void Game::handleEvent(SDL_Event e, int deltaTime)

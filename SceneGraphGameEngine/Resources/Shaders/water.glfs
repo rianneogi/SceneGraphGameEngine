@@ -2,19 +2,26 @@
  
 in vec4 clipSpace;
 in vec2 UV;
+in vec3 toCameraVector;
 
 out vec4 color;
 
 uniform vec3 gWaterColor;
+uniform float gDuDvOffset;
+uniform float gWaveStrength;
 uniform sampler2D gReflectionTexture;
 uniform sampler2D gRefractionTexture;
+uniform sampler2D gDuDv;
 
 void main()
 { 
 	vec2 ndc = (clipSpace.xy/clipSpace.w)/2.0 + 0.5;
+	vec2 distortion = gWaveStrength*(texture(gDuDv, UV+vec2(gDuDvOffset,gDuDvOffset)).xy*2.0 - 1);
 	
-	vec4 refl = texture(gReflectionTexture,vec2(ndc.x,1-ndc.y));
-	vec4 refr = texture(gRefractionTexture,ndc);
+	vec4 refl = texture(gReflectionTexture,vec2(ndc.x,1-ndc.y)+distortion);
+	vec4 refr = texture(gRefractionTexture,ndc+distortion);
 
-	color = mix(refl, refr, 0.5);
+	vec3 viewVector = normalize(toCameraVector);
+
+	color = mix(refl, refr, dot(viewVector, vec3(0,1,0)));
 }

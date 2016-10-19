@@ -249,3 +249,8 @@ void ShaderProgram::setUniformVec4f(std::string name, glm::vec4 vec)
 {
 	glUniform4fv(glGetUniformLocation(mProgramID, name.c_str()), 1, glm::value_ptr(vec));
 }
+
+void ShaderProgram::setTextureLocation(std::string name, unsigned int location)
+{
+	glUniform1i(glGetUniformLocation(mProgramID, name.c_str()), location);
+}

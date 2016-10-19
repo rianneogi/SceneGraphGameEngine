@@ -38,8 +38,8 @@ void Terrain::generate()
 	std::vector<unsigned int> Indices;
 	unsigned int curr_ind = 0;
 
-	mWidth = 64;
-	mLength = 64;
+	mWidth = 320;
+	mLength = 320;
 	mHeightMap = new float[(mWidth+2)*(mLength+2)];
 	for (int i = 0;i < mLength+2;i++)
 	{

@@ -1,6 +1,6 @@
 #version 330
 
-layout(location = 0) in vec3 vertexPosition_modelspace;
+layout(location = 0) in vec3 vertexPosition;
 
 layout(location = 1) in vec2 vertexUV;
 
@@ -8,14 +8,18 @@ layout(location = 2) in vec3 vertexNormal;
 
 out vec4 clipSpace;
 out vec2 UV;
- 
+out vec3 toCameraVector;
+
 uniform mat4 gModelMat;
 uniform mat4 gViewMat;
 uniform mat4 gProjectionMat;
- 
+uniform vec3 gEyePos;
+
 void main()
-{ 
-    gl_Position =  gProjectionMat*gViewMat*gModelMat * vec4(vertexPosition_modelspace,1);
+{
+	vec4 worldPosition = gModelMat * vec4(vertexPosition,1);
+    gl_Position =  gProjectionMat*gViewMat*worldPosition;
     clipSpace = gl_Position;
-	UV = vertexUV;
+	UV = vec2(vertexPosition.x/2.0+0.5, vertexPosition.y/2.0+0.5);
+	toCameraVector = gEyePos - worldPosition.xyz;
 }

@@ -39,6 +39,7 @@ public:
 	void setUniformMat4f(std::string name, glm::mat4 matrix);
 	void setUniformVec3f(std::string name, glm::vec3 vec);
 	void setUniformVec4f(std::string name, glm::vec4 vec);
+	void setTextureLocation(std::string name, unsigned int location);
 
 protected:
 	void printProgramLog(GLuint program);
