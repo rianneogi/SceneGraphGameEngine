@@ -20,6 +20,6 @@ void main()
 	vec4 worldPosition = gModelMat * vec4(vertexPosition,1);
     gl_Position =  gProjectionMat*gViewMat*worldPosition;
     clipSpace = gl_Position;
-	UV = vec2(vertexPosition.x/2.0+0.5, vertexPosition.y/2.0+0.5);
+	UV = worldPosition.xz/32.0;
 	toCameraVector = gEyePos - worldPosition.xyz;
 }

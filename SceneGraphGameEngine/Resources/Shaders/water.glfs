@@ -6,9 +6,12 @@ in vec3 toCameraVector;
 
 out vec4 color;
 
-uniform vec3 gWaterColor;
-uniform float gDuDvOffset;
 uniform float gWaveStrength;
+uniform float gWaveHeight;
+uniform float gSpecularFactor;
+uniform float gShineDamper;
+uniform vec3 gLightDir;
+uniform float gDuDvOffset;
 uniform sampler2D gReflectionTexture;
 uniform sampler2D gRefractionTexture;
 uniform sampler2D gDuDv;
@@ -23,5 +26,12 @@ void main()
 
 	vec3 viewVector = normalize(toCameraVector);
 
-	color = mix(refl, refr, dot(viewVector, vec3(0,1,0)));
+	vec3 normal = normalize(vec3(distortion.x,gWaveHeight,distortion.y));
+	vec3 lightVec = normalize(reflect(gLightDir,normal));
+	float specular = clamp(dot(viewVector, lightVec),0,1);
+	specular = pow(specular, gShineDamper) * gSpecularFactor;
+
+	color = mix(refl, refr, clamp(dot(viewVector, vec3(0,1,0)),0,1)) + vec4(specular, specular, specular, 0.0);
+
+	//color = texture(gDuDv, UV);
 }

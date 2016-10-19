@@ -109,7 +109,10 @@ bool Game::init()
 
 	mShaders[10]->bind();
 	mShaders[10]->setUniformVec3f("gColor", glm::vec3(0.5, 0.5, 1.0));
-	mShaders[10]->setUniformFloat("gWaveStrength", 0.01);
+	mShaders[10]->setUniformFloat("gWaveStrength", mWater->mWaveStrength);
+	mShaders[10]->setUniformFloat("gWaveHeight", mWater->mWaveHeight);
+	mShaders[10]->setUniformFloat("gSpecularFactor", mWater->mSpecularFactor);
+	mShaders[10]->setUniformFloat("gShineDamper", mWater->mShineDamper);
 	mShaders[10]->setTextureLocation("gReflectionTexture", 0);
 	mShaders[10]->setTextureLocation("gRefractionTexture", 1);
 	mShaders[10]->setTextureLocation("gDuDv", 2);
@@ -274,6 +277,7 @@ void Game::render(SDL_Window* window)
 	mShaders[10]->setUniformMat4f("gProjectionMat", projection);
 	mShaders[10]->setUniformFloat("gDuDvOffset", mWater->mDuDvOffset);
 	mShaders[10]->setUniformVec3f("gEyePos", mCamera.mPosition);
+	mShaders[10]->setUniformVec3f("gLightDir", glm::vec3(-1, -1, 1));
 	mWater->render();
 }
 

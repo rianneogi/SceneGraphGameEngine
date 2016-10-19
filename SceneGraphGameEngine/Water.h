@@ -9,6 +9,10 @@ public:
 	Mesh* mMesh;
 	float mDuDvOffset;
 	float mWaveSpeed;
+	float mWaveStrength;
+	float mWaveHeight;
+	float mSpecularFactor;
+	float mShineDamper;
 
 	FrameBuffer mReflectionFBO;
 	FrameBuffer mRefractionFBO;

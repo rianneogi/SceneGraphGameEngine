@@ -18,7 +18,11 @@ Water::Water(Mesh* mesh)
 	mRefractionFBO.unbind();
 
 	mWaveSpeed = 0.000025f;
+	mWaveStrength = 0.01f;
 	mDuDvOffset = 0.f;
+	mWaveHeight = 0.05f;
+	mSpecularFactor = 0.2f;
+	mShineDamper = 1.f;
 }
 
 Water::~Water()
