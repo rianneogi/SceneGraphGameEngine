@@ -1,0 +1,20 @@
+#version 330 core
+ 
+in vec4 clipSpace;
+in vec2 UV;
+
+out vec4 color;
+
+uniform vec3 gWaterColor;
+uniform sampler2D gReflectionTexture;
+uniform sampler2D gRefractionTexture;
+
+void main()
+{ 
+	vec2 ndc = (clipSpace.xy/clipSpace.w)/2.0 + 0.5;
+	
+	vec4 refl = texture(gReflectionTexture,vec2(ndc.x,1-ndc.y));
+	vec4 refr = texture(gRefractionTexture,ndc);
+
+	color = mix(refl, refr, 0.5);
+}

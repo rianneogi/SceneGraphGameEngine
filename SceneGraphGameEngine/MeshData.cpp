@@ -52,7 +52,7 @@ bool MeshData::init(const std::vector<Vertex>& Vertices, const std::vector<unsig
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, Indices.size() * sizeof(unsigned int), &Indices[0], GL_STATIC_DRAW);
 
 	NumIndices = Indices.size();
-	printf("making mesh %d %d\n", (int)VB, (int)IB);
+	printf("Created Mesh, VB: %d, IB: %d\n", (int)VB, (int)IB);
 	return true;
 }
 
@@ -78,11 +78,7 @@ void MeshData::render()
 	//}
 	glDrawElements(GL_TRIANGLES, NumIndices, GL_UNSIGNED_INT, 0);
 
-	GLenum err = GL_NO_ERROR;
-	while ((err = glGetError()) != GL_NO_ERROR)
-	{
-		printf("DRAW ERROR: %d", err);
-	}
+	debugOpengl("DRAW ERROR");
 
 	glDisableVertexAttribArray(0);
 	glDisableVertexAttribArray(1);
@@ -167,6 +163,8 @@ void MeshDataTexArray::render()
 	//}
 	glDrawElements(GL_TRIANGLES, NumIndices, GL_UNSIGNED_INT, 0);
 
+	debugOpengl("DRAW ERROR tex array");
+
 	//debugOpengl("mesh entry 2d array draw");
 	glDisableVertexAttribArray(0);
 	glDisableVertexAttribArray(1);
@@ -235,6 +233,8 @@ void MeshDataSolidColor::render()
 	//	//m_Textures[MaterialIndex]->bind();
 	//}
 	glDrawElements(GL_TRIANGLES, NumIndices, GL_UNSIGNED_INT, 0);
+
+	debugOpengl("DRAW ERROR solid color");
 
 	//debugOpengl("mesh entry 2d array draw");
 	glDisableVertexAttribArray(0);

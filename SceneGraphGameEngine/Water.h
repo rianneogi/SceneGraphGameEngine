@@ -11,7 +11,7 @@ public:
 	FrameBuffer mReflectionFBO;
 	FrameBuffer mRefractionFBO;
 
-	Water();
+	Water(Mesh* mesh);
 	~Water();
 
 	void render();

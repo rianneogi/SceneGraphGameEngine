@@ -171,6 +171,8 @@
     <None Include="Resources\Shaders\phong.glvs" />
     <None Include="Resources\Shaders\skybox.glfs" />
     <None Include="Resources\Shaders\skybox.glvs" />
+    <None Include="Resources\Shaders\water.glfs" />
+    <None Include="Resources\Shaders\water.glvs" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

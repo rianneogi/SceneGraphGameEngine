@@ -48,10 +48,7 @@ bool TextureArray::loadFromFile(std::vector<Texture*> textures, unsigned int wid
 	glGenTextures(1, &mTextureID);
 	glBindTexture(GL_TEXTURE_2D_ARRAY, mTextureID);
 
-	while ((err = glGetError()) != GL_NO_ERROR)
-	{
-		printf("texture generation 1 ERROR: %d\n", err);
-	}
+	debugOpengl("texture array generation start");
 	//glTexStorage3D(GL_TEXTURE_2D_ARRAY, 1, GL_RGBA, TEXTURE_WIDTH, TEXTURE_HEIGHT, TEXTURE_DEPTH);
 	glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_SRGB_ALPHA, mWidth, mHeight, textures.size(), 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
 
@@ -60,13 +57,14 @@ bool TextureArray::loadFromFile(std::vector<Texture*> textures, unsigned int wid
 	{
 		glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, i, mWidth, mHeight, 1, GL_RGBA, GL_UNSIGNED_BYTE, &texels[mBytesPerTexel*mWidth*mHeight*i]);
 	}
-
+	
 	//Parameters
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_LOD_BIAS, 0);
+	debugOpengl("Texture Array paramaters");
 
 	//Mipmaps
 	glGenerateMipmap(GL_TEXTURE_2D_ARRAY);
@@ -90,10 +88,7 @@ bool TextureArray::loadFromFile(std::vector<Texture*> textures, unsigned int wid
 
 	free(texels);
 
-	while ((err = glGetError()) != GL_NO_ERROR)
-	{
-		printf("texture generation 2 ERROR: %d\n", err);
-	}
+	debugOpengl("texture array generation end");
 
 	return true;
 }

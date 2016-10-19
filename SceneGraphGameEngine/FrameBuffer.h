@@ -31,5 +31,6 @@ public:
 	void freeDepthTexture();
 	void freeDepthBuffer();
 	void freeFBO();
+	bool checkStatus() const;
 };
 

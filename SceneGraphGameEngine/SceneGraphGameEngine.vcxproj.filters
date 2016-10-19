@@ -188,5 +188,11 @@
     <None Include="Resources\Shaders\skybox.glvs">
       <Filter>Source Files\Shaders</Filter>
     </None>
+    <None Include="Resources\Shaders\water.glfs">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="Resources\Shaders\water.glvs">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>

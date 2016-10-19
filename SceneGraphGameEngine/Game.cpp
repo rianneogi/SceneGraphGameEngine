@@ -50,9 +50,13 @@ bool Game::init()
 	mMeshes.push_back(new Mesh("Resources//Models//cube2.obj"));
 	mMeshes.push_back(new Mesh("Resources//Models//alduin.obj"));
 	mMeshes.push_back(new Mesh("Resources//Models//tree.obj"));
+	mMeshes.push_back(new Mesh("Resources//Models//plane.obj"));
+
+	mWater = new Water(mMeshes[3]);
 
 	mTextures.push_back(new Texture("Resources//Textures//alduin.jpg"));
-
+	mTextures.push_back(new Texture("Resources//Textures//alduin_n.jpg"));
+	
 	mDayTexture = new CubeMapTexture();
 	mDayTexture->load("Resources//Textures//skybox//right.png", "Resources//Textures//skybox//left.png", "Resources//Textures//skybox//top.png",
 		"Resources//Textures//skybox//bottom.png",  "Resources//Textures//skybox//back.png", "Resources//Textures//skybox//front.png");
@@ -60,15 +64,17 @@ bool Game::init()
 	mSkybox = new SkyBox(mMeshes[0], mDayTexture);
 	mCamera.setPosition(glm::vec3(0, 0, 0));
 
-	//m.loadFromFile("Resources//Models//uvsphere_highres.obj");
-	//t.loadFromFile("Resources//Textures//sky.png");
-	mShaders.push_back(new ShaderProgram("Resources//Shaders//forward_ambient", "#define MULTI_TEXTURE\n"));
-	mShaders.push_back(new ShaderProgram("Resources//Shaders//forward_directional", "#define MULTI_TEXTURE\n"));
-	mShaders.push_back(new ShaderProgram("Resources//Shaders//forward_point", "#define MULTI_TEXTURE\n"));
 	mShaders.push_back(new ShaderProgram("Resources//Shaders//forward_ambient"));
 	mShaders.push_back(new ShaderProgram("Resources//Shaders//forward_directional"));
 	mShaders.push_back(new ShaderProgram("Resources//Shaders//forward_point"));
+	mShaders.push_back(new ShaderProgram("Resources//Shaders//forward_ambient", "#define MULTI_TEXTURE\n"));
+	mShaders.push_back(new ShaderProgram("Resources//Shaders//forward_directional", "#define MULTI_TEXTURE\n"));
+	mShaders.push_back(new ShaderProgram("Resources//Shaders//forward_point", "#define MULTI_TEXTURE\n"));
 	mShaders.push_back(new ShaderProgram("Resources//Shaders//skybox"));
+	mShaders.push_back(new ShaderProgram("Resources//Shaders//forward_ambient", "#define NORMAL_MAP\n"));
+	mShaders.push_back(new ShaderProgram("Resources//Shaders//forward_directional", "#define NORMAL_MAP\n"));
+	mShaders.push_back(new ShaderProgram("Resources//Shaders//forward_point", "#define NORMAL_MAP\n"));
+	mShaders.push_back(new ShaderProgram("Resources//Shaders//water", "#define FIXED_COLOR\n"));
 	
 	mShaders[1]->bind();
 	mShaders[1]->setUniformVec3f("gLight.dir", glm::vec3(-1, -1, 1));
@@ -90,6 +96,24 @@ bool Game::init()
 	mShaders[5]->setUniformFloat("gLight.intensity", 500);
 	mShaders[5]->setUniformVec3f("gLight.color", glm::vec3(1, 1, 1));
 
+	mShaders[8]->bind();
+	mShaders[8]->setUniformVec3f("gLight.dir", glm::vec3(-1, -1, 1));
+	mShaders[8]->setUniformFloat("gLight.intensity", 0.5);
+	mShaders[8]->setUniformVec3f("gLight.color", glm::vec3(1, 1, 1));
+
+	mShaders[9]->bind();
+	mShaders[9]->setUniformVec3f("gLight.pos", mCamera.mPosition);
+	mShaders[9]->setUniformFloat("gLight.intensity", 500);
+	mShaders[9]->setUniformVec3f("gLight.color", glm::vec3(1, 1, 1));
+
+	mShaders[10]->bind();
+	mShaders[10]->setUniformVec3f("gColor", glm::vec3(0.5, 0.5, 1.0));
+
+	GLuint t1Location = glGetUniformLocation(mShaders[10]->getProgramID(), "gReflectionTexture");
+	GLuint t2Location = glGetUniformLocation(mShaders[10]->getProgramID(), "gRefractionTexture");
+	glUniform1i(t1Location, 0);
+	glUniform1i(t2Location, 1);
+
 	//mShaders[3]->bind();
 	//mShaders[3]->setUniformVec3f("gSkyColor", glm::vec3(0, 0, 1));
 
@@ -104,92 +128,143 @@ bool Game::init()
 		mEntities.push_back(glm::translate(glm::mat4(1.0), glm::vec3(x, y, z)));
 	}
 
-	mShadowFBO.createFBO(SCREEN_WIDTH, SCREEN_HEIGHT);
-	mShadowFBO.createDepthBufferAttachment();
-
+	//mShadowFBO.createFBO(SCREEN_WIDTH, SCREEN_HEIGHT);
+	//mShadowFBO.createDepthBufferAttachment();
+	
 	return true;
 }
 
-void Game::render(SDL_Window* window)
+
+void Game::renderSkybox(const glm::mat4& view, const glm::mat4& projection)
 {
-	glm::mat4 model, view, projection;
-	mCamera.render(view, projection);
-
-	glDepthMask(true);
-	glDisable(GL_BLEND);
-
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glCullFace(GL_FRONT);
 	glDepthFunc(GL_LEQUAL);
+
 	mShaders[6]->bind();
 	mShaders[6]->setUniformMat4f("gModelMat", glm::translate(glm::mat4(1.0), mCamera.mPosition));
 	mShaders[6]->setUniformMat4f("gViewMat", view);
 	mShaders[6]->setUniformMat4f("gProjectionMat", projection);
 	mSkybox->render();
 
-	glDepthFunc(GL_LESS);
 	glCullFace(GL_BACK);
+}
+
+void Game::renderScene(const glm::mat4& view, const glm::mat4& projection)
+{
+	/*GLint drawFboId = 0, readFboId = 0;
+	glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &drawFboId);
+	glGetIntegerv(GL_READ_FRAMEBUFFER_BINDING, &readFboId);
+	printf("Rendering with: %d %d\n", drawFboId, readFboId);*/
+
+	glDepthMask(true);
+	glDisable(GL_BLEND);
+	glActiveTexture(GL_TEXTURE0);
+
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+
+	renderSkybox(view, projection);
+
+	glDepthFunc(GL_LESS);
 
 	gTerrain3DTexture->bind();
 	mTextures[0]->bind();
 
-	mShaders[0]->bind();
-	mShaders[0]->setUniformMat4f("M", glm::scale(glm::vec3(1,1,1)));
-	mShaders[0]->setUniformMat4f("V", view);
-	mShaders[0]->setUniformMat4f("P", projection);
-	
-	mTerrain->render();
-
 	mShaders[3]->bind();
+	mShaders[3]->setUniformMat4f("M", glm::scale(glm::vec3(1, 1, 1)));
 	mShaders[3]->setUniformMat4f("V", view);
 	mShaders[3]->setUniformMat4f("P", projection);
+
+	mTerrain->render();
+
+	mShaders[0]->bind();
+	mShaders[0]->setUniformMat4f("V", view);
+	mShaders[0]->setUniformMat4f("P", projection);
 	for (int i = 0;i < mEntities.size();i++)
 	{
-		mShaders[3]->setUniformMat4f("M", mEntities[i]);
+		mShaders[0]->setUniformMat4f("M", mEntities[i]);
 		mMeshes[2]->render();
 	}
-	//mMeshes[1]->render();
+	mMeshes[1]->render();
 
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_ONE, GL_ONE);
 	glDepthMask(false);
 	glDepthFunc(GL_EQUAL);
 
-	mShaders[1]->bind();
-	mShaders[1]->setUniformMat4f("gModelMat", glm::scale(glm::vec3(1, 1, 1)));
-	mShaders[1]->setUniformMat4f("gViewMat", view);
-	mShaders[1]->setUniformMat4f("gProjectionMat", projection);
-	mShaders[1]->setUniformVec3f("gEyePos", mCamera.mPosition);
-	mTerrain->render();
-
+	mShaders[4]->bind();
+	mShaders[4]->setUniformMat4f("gModelMat", glm::scale(glm::vec3(1, 1, 1)));
 	mShaders[4]->setUniformMat4f("gViewMat", view);
 	mShaders[4]->setUniformMat4f("gProjectionMat", projection);
 	mShaders[4]->setUniformVec3f("gEyePos", mCamera.mPosition);
+	mTerrain->render();
+
+	mShaders[1]->bind();
+	mShaders[1]->setUniformMat4f("gViewMat", view);
+	mShaders[1]->setUniformMat4f("gProjectionMat", projection);
+	mShaders[1]->setUniformVec3f("gEyePos", mCamera.mPosition);
 	for (int i = 0;i < mEntities.size();i++)
 	{
-		mShaders[4]->setUniformMat4f("gModelMat", mEntities[i]);
+		mShaders[1]->setUniformMat4f("gModelMat", mEntities[i]);
 		mMeshes[2]->render();
 	}
-	
-	//mMeshes[1]->render();
+	mMeshes[1]->render();
 
-	mShaders[2]->bind();
-	mShaders[2]->setUniformMat4f("gModelMat", glm::scale(glm::vec3(1, 1, 1)));
-	mShaders[2]->setUniformMat4f("gViewMat", view);
-	mShaders[2]->setUniformMat4f("gProjectionMat", projection);
-	mShaders[2]->setUniformVec3f("gEyePos", mCamera.mPosition);
-	mShaders[2]->setUniformVec3f("gLight.pos", mCamera.mPosition);
-
+	mShaders[5]->bind();
+	mShaders[5]->setUniformMat4f("gModelMat", glm::scale(glm::vec3(1, 1, 1)));
 	mShaders[5]->setUniformMat4f("gViewMat", view);
 	mShaders[5]->setUniformMat4f("gProjectionMat", projection);
 	mShaders[5]->setUniformVec3f("gEyePos", mCamera.mPosition);
 	mShaders[5]->setUniformVec3f("gLight.pos", mCamera.mPosition);
 	mTerrain->render();
+
+	mShaders[2]->bind();
+	mShaders[2]->setUniformMat4f("gViewMat", view);
+	mShaders[2]->setUniformMat4f("gProjectionMat", projection);
+	mShaders[2]->setUniformVec3f("gEyePos", mCamera.mPosition);
+	mShaders[2]->setUniformVec3f("gLight.pos", mCamera.mPosition);
 	for (int i = 0;i < mEntities.size();i++)
 	{
-		mShaders[5]->setUniformMat4f("gModelMat", mEntities[i]);
+		mShaders[2]->setUniformMat4f("gModelMat", mEntities[i]);
 		mMeshes[2]->render();
 	}
+	mMeshes[1]->render();
+
+	glDepthMask(true);
+	glDisable(GL_BLEND);
+	glDepthFunc(GL_LESS);
+}
+
+void Game::render(SDL_Window* window)
+{
+	glm::mat4 model, view, projection, view2, projection2;
+	mCamera.render(view2, projection2);
+
+	mCamera.mPosition = glm::vec3(mCamera.mPosition.x, -mCamera.mPosition.y, mCamera.mPosition.z);
+	mCamera.verticalAngle = -mCamera.verticalAngle;
+	mCamera.render(view, projection);
+	mWater->bindReflection();
+	renderScene(view, projection);
+
+	mCamera.mPosition = glm::vec3(mCamera.mPosition.x, -mCamera.mPosition.y, mCamera.mPosition.z);
+	mCamera.verticalAngle = -mCamera.verticalAngle;
+	mCamera.render(view, projection);
+	mWater->bindRefraction();
+	renderScene(view, projection);
+	assert(view == view2 && projection == projection2);
+	mWater->mRefractionFBO.unbind();
+	
+	renderScene(view, projection);
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, mWater->mReflectionFBO.mColorTexture);
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, mWater->mRefractionFBO.mColorTexture);
+	
+	mShaders[10]->bind();
+	mShaders[10]->setUniformMat4f("gModelMat", glm::scale(glm::vec3(160, 160, 160)));
+	mShaders[10]->setUniformMat4f("gViewMat", view);
+	mShaders[10]->setUniformMat4f("gProjectionMat", projection);
+	mWater->render();
 }
 
 void Game::update(int deltaTime)

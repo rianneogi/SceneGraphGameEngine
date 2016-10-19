@@ -1,17 +1,21 @@
 #include "Water.h"
 
-Water::Water()
+Water::Water(Mesh* mesh)
 {
 	mModelMat = glm::mat4(1.0);
-	mMesh = new Mesh("Resources\\Models\\plane.obj");
+	mMesh = mesh;
 
 	mReflectionFBO.createFBO(SCREEN_WIDTH, SCREEN_HEIGHT);
 	mReflectionFBO.createColorTextureAttachment();
 	mReflectionFBO.createDepthBufferAttachment();
+	mReflectionFBO.checkStatus();
+	mReflectionFBO.unbind();
 
 	mRefractionFBO.createFBO(SCREEN_WIDTH, SCREEN_HEIGHT);
-	mReflectionFBO.createColorTextureAttachment();
-	mReflectionFBO.createDepthTextureAttachment();
+	mRefractionFBO.createColorTextureAttachment();
+	mRefractionFBO.createDepthTextureAttachment();
+	mRefractionFBO.checkStatus();
+	mRefractionFBO.unbind();
 }
 
 Water::~Water()

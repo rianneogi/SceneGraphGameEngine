@@ -19,6 +19,8 @@ public:
 	std::vector<Mesh*> mMeshes;
 	FrameBuffer mShadowFBO;
 
+	Water* mWater;
+
 	std::vector<glm::mat4> mEntities;
 
 	bool init();
@@ -27,5 +29,8 @@ public:
 	void render(SDL_Window* window);
 	void update(int deltaTime);
 	void handleEvent(SDL_Event e, int deltaTime);
+
+	void renderSkybox(const glm::mat4& view, const glm::mat4& projection);
+	void renderScene(const glm::mat4& view, const glm::mat4& projection);
 };
 

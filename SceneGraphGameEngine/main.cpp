@@ -2,7 +2,7 @@
 
 #include "Game.h"
 
-#define USE_VSYNC
+//#define USE_VSYNC
 //#define USE_MSAA
 
 Game* gGame = NULL;
@@ -11,13 +11,10 @@ SDL_GLContext gContext;
 
 int SCREEN_WIDTH = 800;
 int SCREEN_HEIGHT = 600;
-int MAX_FPS = 60000;
+int MAX_FPS = 60;
 
 bool initSDL()
 {
-	const GLubyte* glVersion(glGetString(GL_VERSION));
-	printf("OpenGL max version supported: %s\n", glVersion);
-
 	if (SDL_Init(SDL_INIT_VIDEO) < 0)
 	{
 		printf("SDL could not initialize! SDL Error: %s\n", SDL_GetError());
@@ -53,7 +50,7 @@ bool initSDL()
 	//SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 5);
 	//SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 5);
 	//SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 5);*/
-	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
+	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 32);
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 
 	//Anti-aliasing
@@ -93,17 +90,11 @@ bool initGL()
 		return false;
 	}
 
-	//Make sure OpenGL 3.1 is supported
+	//Make sure OpenGL 3.0 is supported
 	if (!GLEW_VERSION_3_1)
 	{
 		printf("OpenGL 3.1 not supported!\n");
 		//return false;
-	}
-
-	if (!GLEW_ARB_vertex_program)
-	{
-		printf("ARB not supported\n");
-		_getch();
 	}
 
 	if (!GLEW_ARB_framebuffer_object)
@@ -187,7 +178,7 @@ void mainLoop()
 		gGame->update(deltaTime);
 		//gTimer.restart();
 
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		gGame->render(gWindow);
 		SDL_GL_SwapWindow(gWindow);
 
