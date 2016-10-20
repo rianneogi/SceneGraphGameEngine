@@ -2,12 +2,12 @@
 
 Camera::Camera()
 {
-	FoV = 45;
-	screenNear = 0.5;
-	screenDepth = 1000;
-	horizontalAngle = 0;
-	verticalAngle = 0;
-	aspectRatio = 4.0f / 3.0f;
+	mFoV = 45;
+	mScreenNear = 0.5;
+	mScreenFar = 1000;
+	mHorizontalAngle = 0;
+	mVerticalAngle = 0;
+	mAspectRatio = 4.0f / 3.0f;
 	mPosition = glm::vec3(0, 0, 0);
 	update();
 }
@@ -34,7 +34,7 @@ void Camera::update()
 	updateDirection();
 
 	// Projection matrix : 45&deg; Field of View, 4:3 ratio, display range : 0.1 unit <-> 100 units
-	mProjectionMatrix = glm::perspective(FoV, aspectRatio, screenNear, screenDepth);
+	mProjectionMatrix = glm::perspective(mFoV, mAspectRatio, mScreenNear, mScreenFar);
 
 	// Camera matrix
 	mViewMatrix = glm::lookAt(
@@ -56,33 +56,33 @@ void Camera::setPosition(const glm::vec3& pos)
 
 void Camera::setFoV(float fov)
 {
-	FoV = fov;
+	mFoV = fov;
 }
 
 void Camera::setHorizontalAngle(float angle)
 {
-	horizontalAngle = angle;
+	mHorizontalAngle = angle;
 	//updateDirection();
 }
 
 void Camera::setVerticalAngle(float angle)
 {
-	verticalAngle = angle;
+	mVerticalAngle = angle;
 	//updateDirection();
 }
 
 void Camera::updateDirection()
 {
 	mDirection = glm::vec3(
-		cos(verticalAngle) * sin(horizontalAngle),
-		sin(verticalAngle),
-		cos(verticalAngle) * cos(horizontalAngle)
+		cos(mVerticalAngle) * sin(mHorizontalAngle),
+		sin(mVerticalAngle),
+		cos(mVerticalAngle) * cos(mHorizontalAngle)
 		);
 
 	mRight = glm::vec3(
-		sin(horizontalAngle - 3.14f / 2.0f),
+		sin(mHorizontalAngle - 3.14f / 2.0f),
 		0,
-		cos(horizontalAngle - 3.14f / 2.0f)
+		cos(mHorizontalAngle - 3.14f / 2.0f)
 		);
 
 	mUp = glm::cross(mRight, mDirection);

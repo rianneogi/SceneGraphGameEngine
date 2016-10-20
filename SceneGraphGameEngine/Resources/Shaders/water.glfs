@@ -15,12 +15,24 @@ uniform float gDuDvOffset;
 uniform sampler2D gReflectionTexture;
 uniform sampler2D gRefractionTexture;
 uniform sampler2D gDuDv;
+uniform sampler2D gDepthTexture;
+uniform float gScreenNear;
+uniform float gScreenFar;
 
 void main()
 { 
 	vec2 ndc = (clipSpace.xy/clipSpace.w)/2.0 + 0.5;
-	vec2 distortion = gWaveStrength*(texture(gDuDv, UV+vec2(gDuDvOffset,gDuDvOffset)).xy*2.0 - 1);
-	
+
+	float floorDepth = texture(gDepthTexture, ndc).r;
+	float floorDistance = 2.0*gScreenNear*gScreenFar / (gScreenFar+gScreenNear - (2.0*floorDepth - 1.0) * (gScreenFar-gScreenNear));
+	float waterDepth = gl_FragCoord.z;
+	float waterDistance = 2.0*gScreenNear*gScreenFar / (gScreenFar+gScreenNear - (2.0*waterDepth - 1.0) * (gScreenFar-gScreenNear));
+
+	float finalDepth = floorDistance-waterDistance;
+	float depthFactor = clamp(finalDepth/5.0 , 0, 1);
+
+	vec2 distortion = gWaveStrength*(texture(gDuDv, UV+vec2(gDuDvOffset,gDuDvOffset)).xy*2.0 - 1)*depthFactor;
+
 	vec4 refl = texture(gReflectionTexture,vec2(ndc.x,1-ndc.y)+distortion);
 	vec4 refr = texture(gRefractionTexture,ndc+distortion);
 
@@ -29,9 +41,9 @@ void main()
 	vec3 normal = normalize(vec3(distortion.x,gWaveHeight,distortion.y));
 	vec3 lightVec = normalize(reflect(gLightDir,normal));
 	float specular = clamp(dot(viewVector, lightVec),0,1);
-	specular = pow(specular, gShineDamper) * gSpecularFactor;
+	specular = pow(specular, gShineDamper) * gSpecularFactor * depthFactor;
 
-	color = mix(refl, refr, clamp(dot(viewVector, vec3(0,1,0)),0,1)) + vec4(specular, specular, specular, 0.0);
-
-	//color = texture(gDuDv, UV);
+	color = mix(refl, refr, clamp(dot(viewVector, normal),0,1)) + vec4(specular, specular, specular, 0.0);
+	color.a = depthFactor;
+	//color = vec4(finalDepth/50,finalDepth/50,finalDepth/50,1.0);
 }

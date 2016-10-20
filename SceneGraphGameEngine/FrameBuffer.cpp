@@ -32,14 +32,14 @@ void FrameBuffer::unbind()
 	glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 }
 
-void FrameBuffer::createFBO(int width, int height)
+void FrameBuffer::initFBO(int width, int height, GLenum drawbuffer)
 {
 	mWidth = width;
 	mHeight = height;
 
 	glGenFramebuffers(1, &mFBO);
 	glBindFramebuffer(GL_FRAMEBUFFER, mFBO);
-	//glDrawBuffer(GL_COLOR_ATTACHMENT0);
+	glDrawBuffer(drawbuffer);
 	//glBindFramebuffer(GL_FRAMEBUFFER, NULL);
 	debugOpengl("fbo init error");
 

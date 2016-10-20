@@ -22,7 +22,7 @@ public:
 	void bind();
 	void unbind();
 
-	void createFBO(int width, int height);
+	void initFBO(int width, int height, GLenum drawbuffer);
 	void createColorTextureAttachment();
 	void createDepthTextureAttachment();
 	void createDepthBufferAttachment();

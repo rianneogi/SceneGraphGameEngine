@@ -5,24 +5,24 @@ Water::Water(Mesh* mesh)
 	mModelMat = glm::mat4(1.0);
 	mMesh = mesh;
 
-	mReflectionFBO.createFBO(SCREEN_WIDTH, SCREEN_HEIGHT);
+	mReflectionFBO.initFBO(SCREEN_WIDTH, SCREEN_HEIGHT, GL_COLOR_ATTACHMENT0);
 	mReflectionFBO.createColorTextureAttachment();
 	mReflectionFBO.createDepthBufferAttachment();
 	mReflectionFBO.checkStatus();
 	mReflectionFBO.unbind();
 
-	mRefractionFBO.createFBO(SCREEN_WIDTH, SCREEN_HEIGHT);
+	mRefractionFBO.initFBO(SCREEN_WIDTH, SCREEN_HEIGHT, GL_COLOR_ATTACHMENT0);
 	mRefractionFBO.createColorTextureAttachment();
 	mRefractionFBO.createDepthTextureAttachment();
 	mRefractionFBO.checkStatus();
 	mRefractionFBO.unbind();
 
 	mWaveSpeed = 0.000025f;
-	mWaveStrength = 0.01f;
+	mWaveStrength = 0.04f;
 	mDuDvOffset = 0.f;
 	mWaveHeight = 0.05f;
-	mSpecularFactor = 0.2f;
-	mShineDamper = 1.f;
+	mSpecularFactor = 0.5f;
+	mShineDamper = 20.f;
 }
 
 Water::~Water()

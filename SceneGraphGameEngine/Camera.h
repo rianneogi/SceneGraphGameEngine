@@ -29,11 +29,11 @@ public:
 	glm::vec3 mRight;
 	glm::vec3 mUp;
 
-	float FoV;
-	float screenNear;
-	float screenDepth;
-	float horizontalAngle;
-	float verticalAngle;
-	float aspectRatio;
+	float mFoV;
+	float mScreenNear;
+	float mScreenFar;
+	float mHorizontalAngle;
+	float mVerticalAngle;
+	float mAspectRatio;
 };
 

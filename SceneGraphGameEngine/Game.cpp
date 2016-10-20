@@ -79,7 +79,7 @@ bool Game::init()
 	
 	mShaders[1]->bind();
 	mShaders[1]->setUniformVec3f("gLight.dir", glm::vec3(-1, -1, 1));
-	mShaders[1]->setUniformFloat("gLight.intensity", 0.5);
+	mShaders[1]->setUniformFloat("gLight.intensity", 1);
 	mShaders[1]->setUniformVec3f("gLight.color", glm::vec3(1, 1, 1));
 	
 	mShaders[2]->bind();
@@ -89,7 +89,7 @@ bool Game::init()
 
 	mShaders[4]->bind();
 	mShaders[4]->setUniformVec3f("gLight.dir", glm::vec3(-1, -1, 1));
-	mShaders[4]->setUniformFloat("gLight.intensity", 0.5);
+	mShaders[4]->setUniformFloat("gLight.intensity", 1);
 	mShaders[4]->setUniformVec3f("gLight.color", glm::vec3(1, 1, 1));
 
 	mShaders[5]->bind();
@@ -99,7 +99,7 @@ bool Game::init()
 
 	mShaders[8]->bind();
 	mShaders[8]->setUniformVec3f("gLight.dir", glm::vec3(-1, -1, 1));
-	mShaders[8]->setUniformFloat("gLight.intensity", 0.5);
+	mShaders[8]->setUniformFloat("gLight.intensity", 1);
 	mShaders[8]->setUniformVec3f("gLight.color", glm::vec3(1, 1, 1));
 
 	mShaders[9]->bind();
@@ -113,9 +113,12 @@ bool Game::init()
 	mShaders[10]->setUniformFloat("gWaveHeight", mWater->mWaveHeight);
 	mShaders[10]->setUniformFloat("gSpecularFactor", mWater->mSpecularFactor);
 	mShaders[10]->setUniformFloat("gShineDamper", mWater->mShineDamper);
+	mShaders[10]->setUniformFloat("gScreenNear", mCamera.mScreenNear);
+	mShaders[10]->setUniformFloat("gScreenFar", mCamera.mScreenFar);
 	mShaders[10]->setTextureLocation("gReflectionTexture", 0);
 	mShaders[10]->setTextureLocation("gRefractionTexture", 1);
 	mShaders[10]->setTextureLocation("gDuDv", 2);
+	mShaders[10]->setTextureLocation("gDepthTexture", 3);
 
 	/*GLuint t1Location = glGetUniformLocation(mShaders[10]->getProgramID(), "gReflectionTexture");
 	GLuint t2Location = glGetUniformLocation(mShaders[10]->getProgramID(), "gRefractionTexture");
@@ -138,8 +141,8 @@ bool Game::init()
 		mEntities.push_back(glm::translate(glm::mat4(1.0), glm::vec3(x, y, z)));
 	}
 
-	//mShadowFBO.createFBO(SCREEN_WIDTH, SCREEN_HEIGHT);
-	//mShadowFBO.createDepthBufferAttachment();
+	mShadowFBO.initFBO(SCREEN_WIDTH, SCREEN_HEIGHT, GL_NONE);
+	mShadowFBO.createDepthBufferAttachment();
 	
 	return true;
 }
@@ -250,13 +253,13 @@ void Game::render(SDL_Window* window)
 	mCamera.render(view2, projection2);
 
 	mCamera.mPosition = glm::vec3(mCamera.mPosition.x, -mCamera.mPosition.y, mCamera.mPosition.z);
-	mCamera.verticalAngle = -mCamera.verticalAngle;
+	mCamera.mVerticalAngle = -mCamera.mVerticalAngle;
 	mCamera.render(view, projection);
 	mWater->bindReflection();
 	renderScene(view, projection);
 
 	mCamera.mPosition = glm::vec3(mCamera.mPosition.x, -mCamera.mPosition.y, mCamera.mPosition.z);
-	mCamera.verticalAngle = -mCamera.verticalAngle;
+	mCamera.mVerticalAngle = -mCamera.mVerticalAngle;
 	mCamera.render(view, projection);
 	mWater->bindRefraction();
 	renderScene(view, projection);
@@ -270,7 +273,12 @@ void Game::render(SDL_Window* window)
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, mWater->mRefractionFBO.mColorTexture);
 	mTextures[2]->bind(GL_TEXTURE2);
+	glActiveTexture(GL_TEXTURE3);
+	glBindTexture(GL_TEXTURE_2D, mWater->mRefractionFBO.mDepthTexture);
 	
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
 	mShaders[10]->bind();
 	mShaders[10]->setUniformMat4f("gModelMat", glm::translate(glm::scale(glm::vec3(160, 160, 160)), glm::vec3(1,0,1)));
 	mShaders[10]->setUniformMat4f("gViewMat", view);
@@ -295,15 +303,15 @@ void Game::handleEvent(SDL_Event e, int deltaTime)
 	{
 		Vector2i pos(e.motion.xrel, e.motion.yrel);
 
-		mCamera.horizontalAngle -= gMouseSpeed * deltaTime * pos.x;
-		mCamera.verticalAngle -= gMouseSpeed * deltaTime * pos.y;
-		if (mCamera.verticalAngle > 3.14f / 2)
+		mCamera.mHorizontalAngle -= gMouseSpeed * deltaTime * pos.x;
+		mCamera.mVerticalAngle -= gMouseSpeed * deltaTime * pos.y;
+		if (mCamera.mVerticalAngle > 3.14f / 2)
 		{
-			mCamera.verticalAngle = 3.14f / 2;
+			mCamera.mVerticalAngle = 3.14f / 2;
 		}
-		if (mCamera.verticalAngle < -3.14f / 2)
+		if (mCamera.mVerticalAngle < -3.14f / 2)
 		{
-			mCamera.verticalAngle = -3.14f / 2;
+			mCamera.mVerticalAngle = -3.14f / 2;
 		}
 		/*if (gCamera.horizontalAngle > 3.14f)
 		{
