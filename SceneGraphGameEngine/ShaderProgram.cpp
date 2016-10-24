@@ -132,7 +132,7 @@ GLuint ShaderProgram::loadShaderFromFile(std::string path, GLenum shaderType, st
 		shaderID = glCreateShader(shaderType);
 
 		//Set shader source
-		std::string tmp = defs + shaderString;
+		std::string tmp = "#version 330\n" + defs + shaderString;
 		const GLchar* shaderSource = tmp.c_str();
 		glShaderSource(shaderID, 1, (const GLchar**)&shaderSource, NULL);
 

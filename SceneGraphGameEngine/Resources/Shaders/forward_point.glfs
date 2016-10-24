@@ -1,4 +1,4 @@
-#version 330 core
+//#version 330 core
  
 #ifdef MULTI_TEXTURE
 in vec3 UV;
