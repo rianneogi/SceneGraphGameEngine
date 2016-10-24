@@ -248,3 +248,4 @@ ModelManifest.xml
 *.sln
 *.db
 *.opendb
+*.vcxproj
