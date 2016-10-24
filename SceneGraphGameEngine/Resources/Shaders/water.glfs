@@ -31,7 +31,7 @@ void main()
 	float finalDepth = floorDistance-waterDistance;
 	float depthFactor = clamp(finalDepth/5.0 , 0, 1);
 
-	vec2 distortion = gWaveStrength*(texture(gDuDv, UV+vec2(gDuDvOffset,gDuDvOffset)).xy*2.0 - 1)*depthFactor;
+	vec2 distortion = gWaveStrength*(texture(gDuDv, UV+vec2(gDuDvOffset,gDuDvOffset)).xy*2.0 - 1)*clamp(finalDepth/20.0 , 0, 1);
 
 	vec4 refl = texture(gReflectionTexture,vec2(ndc.x,1-ndc.y)+distortion);
 	vec4 refr = texture(gRefractionTexture,ndc+distortion);

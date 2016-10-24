@@ -62,7 +62,7 @@ void Terrain::generate()
 			int tex = 0;
 			if (j > 32)
 			{
-				tex = 2;
+				tex = 3;
 			}
 			Vertices.push_back(VertexTexArray(glm::vec3(i, getHeight(i, j), j), glm::vec3(i,j,tex), calculateNormal(i+1, j+1)));
 		}
