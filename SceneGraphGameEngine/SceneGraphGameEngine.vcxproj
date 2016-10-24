@@ -69,8 +69,8 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>C:\Program Files %28x86%29\Code\Libraries\glm;C:\Program Files %28x86%29\Code\Libraries\SDL2-devel-2.0.4-VC\SDL2-2.0.4\include;C:\Program Files %28x86%29\Code\Libraries\glew-1.13.0\include;C:\Program Files %28x86%29\Code\Libraries\DevIL-SDK-x86-1.7.8\include;C:\Program Files %28x86%29\Code\Libraries\Assimp\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Program Files %28x86%29\Code\Libraries\SDL2-devel-2.0.4-VC\SDL2-2.0.4\lib\x86;C:\Program Files %28x86%29\Code\Libraries\glew-1.13.0\lib\Release\Win32;C:\Program Files %28x86%29\Code\Libraries\Assimp\lib\x86;C:\Program Files %28x86%29\Code\Libraries\DevIL-SDK-x86-1.7.8\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Documents\Code\Libraries\glm;C:\Documents\Code\Libraries\SDL2-devel-2.0.4-VC\SDL2-2.0.4\include;C:\Documents\Code\Libraries\glew-1.13.0\include;C:\Documents\Code\Libraries\DevIL-SDK-x86-1.7.8\include;C:\Documents\Code\Libraries\Assimp\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Documents\Code\Libraries\SDL2-devel-2.0.4-VC\SDL2-2.0.4\lib\x86;C:\Documents\Code\Libraries\glew-1.13.0\lib\Release\Win32;C:\Documents\Code\Libraries\Assimp\lib\x86;C:\Documents\Code\Libraries\DevIL-SDK-x86-1.7.8\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
