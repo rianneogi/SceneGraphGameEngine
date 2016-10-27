@@ -2,7 +2,7 @@
 
 #include "Game.h"
 
-//#define USE_VSYNC
+#define USE_VSYNC
 //#define USE_MSAA
 
 Game* gGame = NULL;
@@ -41,15 +41,15 @@ bool initSDL()
 
 	//SDL_WarpMouseInWindow(gWindow, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
 	//SDL_SetRelativeMouseMode(SDL_TRUE);
-
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_COMPATIBILITY);
+	//SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
 
-	///*SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 5);
-	//SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 5);
-	//SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 5);
-	//SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 5);*/
+	/*SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 5);
+	SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 5);
+	SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 5);
+	SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 5);*/
 	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 32);
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 
@@ -67,7 +67,7 @@ bool initSDL()
 		_getch();
 	}
 	SDL_GL_MakeCurrent(gWindow, gContext);
-
+	
 	int x;
 	SDL_GL_GetAttribute(SDL_GL_MULTISAMPLESAMPLES, &x);
 	printf("BUFFERS: %d\n", x);
@@ -76,18 +76,35 @@ bool initSDL()
 	glEnable(GL_MULTISAMPLE);
 #endif
 
+	GLenum error = glGetError();
+	if (error != GL_NO_ERROR)
+	{
+		printf("GL error when initializing SDL %s\n", gluErrorString(error));
+		_getch();
+		return false;
+	}
+
 	return true;
 }
 
 bool initGL()
 {
+	const GLubyte* glVersion(glGetString(GL_VERSION));
+	printf("OpenGL max version supported: %s\n", glVersion);
+
 	//Initialize GLEW
-	//glewExperimental = GL_TRUE;
+	glewExperimental = GL_TRUE;
 	GLenum glewError = glewInit();
 	if (glewError != GLEW_OK)
 	{
 		printf("Error initializing GLEW! %s\n", glewGetErrorString(glewError));
 		return false;
+	}
+	
+	GLenum error = glGetError();
+	if (error != GL_NO_ERROR) //catch this error to ignore it
+	{
+		printf("GL error when initializing GLEW %s\n", gluErrorString(error));
 	}
 
 	//Make sure OpenGL 3.0 is supported
@@ -126,7 +143,7 @@ bool initGL()
 	glEnable(GL_CULL_FACE);
 
 	//Check for error
-	GLenum error = glGetError();
+	error = glGetError();
 	if (error != GL_NO_ERROR)
 	{
 		printf("Error initializing OpenGL! %s\n", gluErrorString(error));
@@ -229,9 +246,16 @@ int main(int argc, char* args[])
 		_getch();
 	}
 
+	int x, y;
+	SDL_GL_GetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, &x);
+	SDL_GL_GetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, &y);
+	printf("Opengl Version: %d %d\n", x, y);
+	
+
 	mainLoop();
 
 	delete gGame;
+	SDL_GL_DeleteContext(gContext);
 
 	return 0;
 }

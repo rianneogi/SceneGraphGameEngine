@@ -51,9 +51,11 @@ bool Texture::loadTextureFromPixels32(GLuint* pixels, GLuint width, GLuint heigh
 
 	//Generate texture
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
-
-	glEnable(GL_TEXTURE_2D);
+	//debugOpengl("texture test 1");
+	//glEnable(GL_TEXTURE_2D);
+	//debugOpengl("texture test 2");
 	glGenerateMipmap(GL_TEXTURE_2D);
+	
 
 	//Set texture parameters
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -61,7 +63,7 @@ bool Texture::loadTextureFromPixels32(GLuint* pixels, GLuint width, GLuint heigh
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_LOD_BIAS, 0);
-
+	
 	if (GLEW_EXT_texture_filter_anisotropic)
 	{
 		float amount = 0;

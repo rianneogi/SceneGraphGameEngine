@@ -20,6 +20,7 @@ public:
 	void update();
 	void updateDirection();
 	Frustum getFrustum() const;
+	Frustum getFrustumBoundingBox() const;
 
 	glm::mat4 mViewMatrix;
 	glm::mat4 mProjectionMatrix;

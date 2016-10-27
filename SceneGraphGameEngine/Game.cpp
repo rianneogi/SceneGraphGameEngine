@@ -8,7 +8,7 @@ Game::Game()
 {
 	mDayTexture = NULL;
 	mSkybox = NULL;
-	mTerrain = NULL;
+	//mTerrain = NULL;
 	mNightTexture = NULL;
 }
 
@@ -34,12 +34,18 @@ Game::~Game()
 		if (mShaders[i] != NULL)
 			delete mShaders[i];
 	}
-	if (mTerrain != NULL)
-		delete mTerrain;
+	/*if (mTerrain != NULL)
+		delete mTerrain;*/
 	if (gTerrain3DTexture != NULL)
 		delete gTerrain3DTexture;
 	if (mDayTexture != NULL)
 		delete mDayTexture;
+
+	for (auto i = mTerrainChunks.begin(); i != mTerrainChunks.end(); i++)
+	{
+		if (i->second != NULL);
+			delete i->second;
+	}
 }
 
 bool Game::init()
@@ -120,26 +126,18 @@ bool Game::init()
 	mShaders[10]->setTextureLocation("gDuDv", 2);
 	mShaders[10]->setTextureLocation("gDepthTexture", 3);
 
-	/*GLuint t1Location = glGetUniformLocation(mShaders[10]->getProgramID(), "gReflectionTexture");
-	GLuint t2Location = glGetUniformLocation(mShaders[10]->getProgramID(), "gRefractionTexture");
-	GLuint t3Location = glGetUniformLocation(mShaders[10]->getProgramID(), "gDuDv");
-	glUniform1i(t1Location, 0);
-	glUniform1i(t2Location, 1);
-	glUniform1i(t3Location, 2);*/
-
 	//mShaders[3]->bind();
 	//mShaders[3]->setUniformVec3f("gSkyColor", glm::vec3(0, 0, 1));
 
-	mTerrain = new Terrain();
-	mTerrain->generate();
+	updateChunks();
 
-	for (int i = 0;i < 50;i++)
+	/*for (int i = 0;i < 50;i++)
 	{
 		float x = rand() % 320;
 		float z = rand() % 320;
 		float y = mTerrain->getHeight(x, z);
 		mEntities.push_back(glm::translate(glm::mat4(1.0), glm::vec3(x, y, z)));
-	}
+	}*/
 
 	mShadowFBO.initFBO(SCREEN_WIDTH, SCREEN_HEIGHT, GL_NONE);
 	mShadowFBO.createDepthBufferAttachment();
@@ -187,7 +185,7 @@ void Game::renderScene(const glm::mat4& view, const glm::mat4& projection)
 	mShaders[3]->setUniformMat4f("V", view);
 	mShaders[3]->setUniformMat4f("P", projection);
 
-	mTerrain->render();
+	renderTerrain(view, projection);
 
 	mShaders[0]->bind();
 	mShaders[0]->setUniformMat4f("V", view);
@@ -209,7 +207,7 @@ void Game::renderScene(const glm::mat4& view, const glm::mat4& projection)
 	mShaders[4]->setUniformMat4f("gViewMat", view);
 	mShaders[4]->setUniformMat4f("gProjectionMat", projection);
 	mShaders[4]->setUniformVec3f("gEyePos", mCamera.mPosition);
-	mTerrain->render();
+	renderTerrain(view, projection);
 
 	mShaders[1]->bind();
 	mShaders[1]->setUniformMat4f("gViewMat", view);
@@ -228,7 +226,7 @@ void Game::renderScene(const glm::mat4& view, const glm::mat4& projection)
 	mShaders[5]->setUniformMat4f("gProjectionMat", projection);
 	mShaders[5]->setUniformVec3f("gEyePos", mCamera.mPosition);
 	mShaders[5]->setUniformVec3f("gLight.pos", mCamera.mPosition);
-	mTerrain->render();
+	renderTerrain(view, projection);
 
 	mShaders[2]->bind();
 	mShaders[2]->setUniformMat4f("gViewMat", view);
@@ -247,10 +245,24 @@ void Game::renderScene(const glm::mat4& view, const glm::mat4& projection)
 	glDepthFunc(GL_LESS);
 }
 
+void Game::renderWithShadows(const glm::mat4 & view, const glm::mat4 & projection)
+{
+	/*mShadowFBO.bind();
+	mShaders[SHADER_SHADOW]->bind();
+	glm::mat4 lightView = glm::lookAt(mCamera.mPosition - mSunDirection, mCamera.mPosition, glm::vec3(0, 1, 0));
+	glm::mat4 lightProj = glm::ortho<float>(-2 * gSunDistance, 2 * gSunDistance, -2 * gSunDistance, 2 * gSunDistance, -2 * gSunDistance, 4 * gSunDistance);
+	renderScene(view, lightProj);*/
+
+
+}
+
 void Game::render(SDL_Window* window)
 {
 	glm::mat4 model, view, projection, view2, projection2;
 	mCamera.render(view2, projection2);
+
+	//glm::mat4 lightView = glm::lookAt(mCamera.mPosition-mSunDirection, mCamera.mPosition, glm::vec3(0, 1, 0));
+//	glm::ortho<float>(-2 * gSunDistance, 2 * gSunDistance, -2 * gSunDistance, 2 * gSunDistance, -2 * gSunDistance, 4 * gSunDistance);
 
 	mCamera.mPosition = glm::vec3(mCamera.mPosition.x, -mCamera.mPosition.y, mCamera.mPosition.z);
 	mCamera.mVerticalAngle = -mCamera.mVerticalAngle;
@@ -293,6 +305,43 @@ void Game::update(int deltaTime)
 {
 	mCamera.update();
 	mWater->update(deltaTime);
+	updateChunks();
+}
+
+void Game::updateChunks()
+{
+	Vector2i cameraPos = getAligned(mCamera.mPosition.x, mCamera.mPosition.z, CONST_BLOCKSIZE);
+	Vector2i chunk = getAligned(cameraPos.x, cameraPos.y, CONST_CHUNKSIZE);
+	for (int i = chunk.x - 1; i <= chunk.x + 1; i++)
+	{
+		for (int j = chunk.y - 1; j <= chunk.y + 1; j++)
+		{
+			std::string id = getChunkString(i, j);
+			if (mTerrainChunks.count(id) == 0)
+			{
+				mTerrainChunks[id] = new Terrain(i, j);
+				mTerrainChunks[id]->generate();
+				printf("Generating chunk id: %s\n", id.c_str());
+			}
+		}
+	}
+}
+
+void Game::renderTerrain(const glm::mat4 & view, const glm::mat4 & projection)
+{
+	Vector2i cameraPos = getAligned(mCamera.mPosition.x, mCamera.mPosition.z, CONST_BLOCKSIZE);
+	Vector2i chunk = getAligned(cameraPos.x, cameraPos.y, CONST_CHUNKSIZE);
+	for (int i = chunk.x - 1; i <= chunk.x + 1; i++)
+	{
+		for (int j = chunk.y - 1; j <= chunk.y + 1; j++)
+		{
+			std::string id = getChunkString(i, j);
+			if (mTerrainChunks.count(id) != 0)
+			{
+				mTerrainChunks[getChunkString(i, j)]->render();
+			}
+		}
+	}
 }
 
 void Game::handleEvent(SDL_Event e, int deltaTime)
@@ -366,4 +415,60 @@ void Game::handleEvent(SDL_Event e, int deltaTime)
 	//mCamera.update();
 }
 
+std::string Game::getChunkString(int i, int j)
+{
+	return (std::to_string(i) + " " + std::to_string(j));
+}
+
+Vector2i getAligned(double x, double y, double period)
+{
+	int x0, y0, z0;
+	if (x >= 0)
+	{
+		x0 = x / period;
+	}
+	else
+	{
+		x0 = floor(x / period);
+	}
+	if (y >= 0)
+	{
+		y0 = y / period;
+	}
+	else
+	{
+		y0 = floor(y / period);
+	}
+	return Vector2i(x0, y0);
+}
+
+Vector3i getAligned(double x, double y, double z, double period)
+{
+	int x0, y0, z0;
+	if (x >= 0)
+	{
+		x0 = x / period;
+	}
+	else
+	{
+		x0 = floor(x / period);
+	}
+	if (y >= 0)
+	{
+		y0 = y / period;
+	}
+	else
+	{
+		y0 = floor(y / period);
+	}
+	if (z >= 0)
+	{
+		z0 = z / period;
+	}
+	else
+	{
+		z0 = floor(z / period);
+	}
+	return Vector3i(x0, y0, z0);
+}
 

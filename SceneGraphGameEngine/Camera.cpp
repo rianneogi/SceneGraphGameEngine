@@ -140,6 +140,12 @@ Frustum Camera::getFrustum() const
 	return res;
 }
 
+Frustum Camera::getFrustumBoundingBox() const
+{
+
+	return Frustum();
+}
+
 //std::vector<glm::vec4> Camera::getFrustum2()
 //{
 //	float tanfov = tan(FoV);

@@ -1,9 +1,18 @@
 #include "Terrain.h"
 
+float CONST_BLOCKSIZE = 1.0f;
+int CONST_CHUNKSIZE = 128;
+
 Terrain::Terrain()
 {
-	mTexture = NULL;
 	mMesh = NULL;
+	mChunkPos = Vector2i(0, 0);
+}
+
+Terrain::Terrain(int i, int j)
+{
+	mMesh = NULL;
+	mChunkPos = Vector2i(i, j);
 }
 
 Terrain::~Terrain()
@@ -24,10 +33,13 @@ float Terrain::getHeight(int x, int z)
 
 float perlinOctaves(float i, float j)
 {
-	float res = 2 * glm::perlin(glm::vec2(i / 20.0, j / 20.0));
-	res += 4 * glm::perlin(glm::vec2(i / 40.0, j / 40.0));
-	res += 8 * glm::perlin(glm::vec2(i / 80.0, j / 80.0));
-	res += 16 * glm::perlin(glm::vec2(i / 160.0, j / 160.0));
+	float res = 0;
+	//res += 4 * glm::perlin(glm::vec2(i / 20.0, j / 20.0));
+	res += 8 * glm::perlin(glm::vec2(i / 40.0, j / 40.0));
+	res += 16 * glm::perlin(glm::vec2(i / 80.0, j / 80.0));
+	res += 32 * glm::perlin(glm::vec2(i / 160.0, j / 160.0));
+	res += 64 * glm::perlin(glm::vec2(i / 320.0, j / 320.0));
+	//res += 64 * glm::perlin(glm::vec2(i / 640.0, j / 640.0));
 	return res;
 }
 
@@ -38,22 +50,16 @@ void Terrain::generate()
 	std::vector<unsigned int> Indices;
 	unsigned int curr_ind = 0;
 
-	mWidth = 320;
-	mLength = 320;
+	mWidth = CONST_CHUNKSIZE;
+	mLength = CONST_CHUNKSIZE;
 	mHeightMap = new float[(mWidth+2)*(mLength+2)];
 	for (int i = 0;i < mLength+2;i++)
 	{
 		for (int j = 0;j < mWidth+2;j++)
 		{
-			mHeightMap[i * mWidth + j] = perlinOctaves(i,j);
+			mHeightMap[i * mWidth + j] = perlinOctaves(mChunkPos.x*CONST_CHUNKSIZE+i, mChunkPos.y*CONST_CHUNKSIZE+j);
 		}
 	}
-
-	/*glm::vec3* colors = new glm::vec3[4];
-	colors[0] = glm::vec3(196 / 255.0, 212 / 255.0, 170 / 255.0);
-	colors[1] = glm::vec3(221/255.0, 221/255.0, 187/255.0);
-	colors[2] = glm::vec3(233/255.0, 221/255.0, 199/255.0);
-	colors[3] = glm::vec3(156/255.0, 187/255.0, 169/255.0);*/
 
 	for (int i = 0;i < mLength;i++)
 	{
@@ -64,11 +70,10 @@ void Terrain::generate()
 			{
 				tex = 3;
 			}
-			Vertices.push_back(VertexTexArray(glm::vec3(i, getHeight(i, j), j), glm::vec3(i,j,tex), calculateNormal(i+1, j+1)));
+			Vertices.push_back(VertexTexArray(glm::vec3(mChunkPos.x*CONST_BLOCKSIZE*CONST_CHUNKSIZE,0, mChunkPos.y*CONST_BLOCKSIZE*CONST_CHUNKSIZE) + 
+				glm::vec3(i, getHeight(i, j), j), glm::vec3(i,j,tex), calculateNormal(i+1, j+1)));
 		}
 	}
-
-	//delete[] colors;
 
 	for (int i = 0;i < mLength-1;i++)
 	{

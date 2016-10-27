@@ -76,6 +76,7 @@ void MeshData::render()
 	//	//m_Textures[MaterialIndex]->bind(GL_TEXTURE0);
 	//	//m_Textures[MaterialIndex]->bind();
 	//}
+	debugOpengl("PRE-DRAW ERROR");
 	glDrawElements(GL_TRIANGLES, NumIndices, GL_UNSIGNED_INT, 0);
 
 	debugOpengl("DRAW ERROR");
