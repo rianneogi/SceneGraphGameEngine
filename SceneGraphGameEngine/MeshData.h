@@ -8,7 +8,8 @@ struct Vertex
 	glm::vec3 Pos;
 	glm::vec2 UV;
 	glm::vec3 Normal;
-	Vertex(glm::vec3 p, glm::vec2 uv, glm::vec3 n) : Pos(p), UV(uv), Normal(n) {}
+	glm::vec3 Tangent;
+	Vertex(glm::vec3 p, glm::vec2 uv, glm::vec3 n, glm::vec3 t) : Pos(p), UV(uv), Normal(n), Tangent(t) {}
 };
 
 struct VertexTexArray

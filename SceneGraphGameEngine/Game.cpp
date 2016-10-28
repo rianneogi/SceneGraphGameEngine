@@ -195,7 +195,8 @@ void Game::renderScene(const glm::mat4& view, const glm::mat4& projection)
 		mShaders[0]->setUniformMat4f("M", mEntities[i]);
 		mMeshes[2]->render();
 	}
-	//mMeshes[1]->render();
+	mShaders[0]->setUniformMat4f("gModelMat", glm::mat4(1.0));
+	mMeshes[1]->render();
 
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_ONE, GL_ONE);
@@ -218,7 +219,8 @@ void Game::renderScene(const glm::mat4& view, const glm::mat4& projection)
 		mShaders[1]->setUniformMat4f("gModelMat", mEntities[i]);
 		mMeshes[2]->render();
 	}
-	//mMeshes[1]->render();
+	mShaders[1]->setUniformMat4f("gModelMat", glm::mat4(1.0));
+	mMeshes[1]->render();
 
 	mShaders[5]->bind();
 	mShaders[5]->setUniformMat4f("gModelMat", glm::scale(glm::vec3(1, 1, 1)));
@@ -238,7 +240,8 @@ void Game::renderScene(const glm::mat4& view, const glm::mat4& projection)
 		mShaders[2]->setUniformMat4f("gModelMat", mEntities[i]);
 		mMeshes[2]->render();
 	}
-	//mMeshes[1]->render();
+	mShaders[2]->setUniformMat4f("gModelMat", glm::mat4(1.0));
+	mMeshes[1]->render();
 
 	glDepthMask(true);
 	glDisable(GL_BLEND);

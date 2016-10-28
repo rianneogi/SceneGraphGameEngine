@@ -77,10 +77,12 @@ void Mesh::InitMesh(unsigned int Index, const aiMesh* paiMesh)
 		const aiVector3D* pPos = &(paiMesh->mVertices[i]);
 		const aiVector3D* pNormal = paiMesh->HasNormals() ? &(paiMesh->mNormals[i]) : &Zero3D;
 		const aiVector3D* pTexCoord = paiMesh->HasTextureCoords(0) ? &(paiMesh->mTextureCoords[0][i]) : &Zero3D;
+		const aiVector3D* pTangent = paiMesh->HasTangentsAndBitangents() ? &(paiMesh->mTangents[i]) : &Zero3D;
 
 		Vertex v(glm::vec3(pPos->x, pPos->y, pPos->z),
 			glm::vec2(pTexCoord->x, pTexCoord->y),
-			glm::vec3(pNormal->x, pNormal->y, pNormal->z));
+			glm::vec3(pNormal->x, pNormal->y, pNormal->z),
+			glm::vec3(pTangent->x, pTangent->y, pTangent->z));
 
 		Vertices.push_back(v);
 	}

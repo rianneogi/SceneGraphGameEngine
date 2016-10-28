@@ -16,9 +16,9 @@ MeshData::~MeshData()
 void MeshData::clear()
 {
 	// Disable the two vertex array attributes.
-	glDisableVertexAttribArray(0);
+	/*glDisableVertexAttribArray(0);
 	glDisableVertexAttribArray(1);
-	glDisableVertexAttribArray(2);
+	glDisableVertexAttribArray(2);*/
 
 	// Release the vertex buffer.
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -61,11 +61,13 @@ void MeshData::render()
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
 	glEnableVertexAttribArray(2);
+	glEnableVertexAttribArray(3);
 
 	glBindBuffer(GL_ARRAY_BUFFER, VB);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const GLvoid*)offsetof(Vertex, Pos));
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const GLvoid*)offsetof(Vertex, UV));
 	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const GLvoid*)offsetof(Vertex, Normal));
+	glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const GLvoid*)offsetof(Vertex, Tangent));
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IB);
 	//printf("4 %d, using buffers %d and %d\n", mEntries[i].NumIndices, mEntries[i].VB, mEntries[i].IB);
@@ -84,6 +86,7 @@ void MeshData::render()
 	glDisableVertexAttribArray(0);
 	glDisableVertexAttribArray(1);
 	glDisableVertexAttribArray(2);
+	glDisableVertexAttribArray(3);
 }
 
 MeshDataTexArray::MeshDataTexArray()

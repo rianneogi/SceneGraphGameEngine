@@ -11,6 +11,7 @@ layout(location = 1) in vec2 vertexUV;
 #endif
 
 layout(location = 2) in vec3 vertexNormal;
+layout(location = 3) in vec3 vertexTangent;
 
 #ifdef MULTI_TEXTURE
 out vec3 UV;
