@@ -1,0 +1,57 @@
+//#version 330
+
+
+layout(location = 0) in vec3 vertexPosition_modelspace;
+
+#ifdef MULTI_TEXTURE
+layout(location = 1) in vec3 vertexUV;
+#elif defined(SOLID_COLOR)
+layout(location = 1) in vec3 vertexUV;
+#else
+layout(location = 1) in vec2 vertexUV;
+#endif
+
+layout(location = 2) in vec3 vertexNormal;
+layout(location = 3) in vec3 vertexTangent;
+
+#ifdef MULTI_TEXTURE
+out vec3 UV;
+#elif defined(SOLID_COLOR)
+out vec3 UV;
+#else
+out vec2 UV;
+#endif
+out vec3 fragPos;
+//out vec3 fragNormal;
+//out vec3 fragTangent;
+//out vec3 fragBitangent;
+out vec3 lightDirection_tangentspace;
+out vec3 eyeVector_tangentspace;
+ 
+uniform mat4 gModelMat;
+uniform mat4 gViewMat;
+uniform mat4 gProjectionMat;
+
+uniform vec3 gEyePos;
+uniform struct Light {
+	vec3 dir;
+	vec3 color;
+	float intensity;
+} gLight;
+ 
+void main()
+{ 
+    gl_Position =  gProjectionMat*gViewMat*gModelMat * vec4(vertexPosition_modelspace,1.0);
+    UV = vertexUV;
+	
+	vec4 vertexPosition_worldspace = gModelMat * vec4(vertexPosition_modelspace,1.0);
+
+	vec3 norm = normalize((gModelMat*vec4(vertexNormal,0.0)).xyz);
+	vec3 tang = normalize((gModelMat*vec4(vertexTangent,0.0)).xyz);
+	vec3 bitang = normalize(cross(norm,tang));
+	
+	mat3 toTangentSpace = mat3(tang.x,bitang.x,norm.x,tang.y,bitang.y,norm.y,tang.z,bitang.z,norm.z);
+
+	lightDirection_tangentspace = normalize(toTangentSpace* gLight.dir);
+	eyeVector_tangentspace = normalize(toTangentSpace*(gEyePos-(vertexPosition_worldspace.xyz)));
+}

@@ -7,12 +7,8 @@ in vec3 UV;
 #else
 in vec2 UV;
 #endif
-//in vec3 fragPos;
-//in vec3 fragNormal;
-//in vec3 fragTangent;
-//in vec3 fragBitangent;
-in vec3 lightDirection_tangentspace;
-in vec3 eyeVector_tangentspace;
+in vec3 fragPos;
+in vec3 fragNormal;
  
 out vec4 color;
  
@@ -38,20 +34,14 @@ void main()
 { 
 	//Normal = normalize(cross(dFdx(fragPos), dFdy(fragPos)))
 
-	#ifdef NORMAL_MAP
-	vec3 fragNormal = normalize((2.0*texture(gNormalMap, UV) - 1.0).rgb);
-	#else
-	vec3 fragNormal = vec3(0,0,1);
-	#endif
-
-    float cosTheta = clamp( dot( fragNormal,-lightDirection_tangentspace ), 0,1 );
+    float cosTheta = clamp( dot( fragNormal,-gLight.dir ), 0,1 );
 		
 	vec3 diffuseVector = vec3(cosTheta,cosTheta,cosTheta);
 	
-	//vec3 vertexPosition_worldspace = (gModelMat*vec4(fragPos,1)).xyz;
-	//vec3 eyeVector = normalize(gEyePos-vertexPosition_worldspace);
-	vec3 reflection = normalize(reflect(lightDirection_tangentspace,fragNormal));
-	float cosAlpha = clamp( dot(eyeVector_tangentspace,reflection), 0,1 );
+	vec3 vertexPosition_worldspace = (gModelMat*vec4(fragPos,1)).xyz;
+	vec3 eyeVector = normalize(gEyePos-vertexPosition_worldspace);
+	vec3 reflection = normalize(reflect(gLight.dir,fragNormal));
+	float cosAlpha = clamp( dot(eyeVector,reflection), 0,1 );
 	//vec3 halfway = normalize(gLight.pos + eyeVector);
 	//float cosAlpha = clamp(normalize(dot(fragNormal,halfway)),0,1);
 	cosAlpha = pow(cosAlpha,5);

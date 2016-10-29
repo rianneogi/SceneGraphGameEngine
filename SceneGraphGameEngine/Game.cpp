@@ -79,12 +79,12 @@ bool Game::init()
 	mShaders.push_back(new ShaderProgram("Resources//Shaders//forward_point", "#define MULTI_TEXTURE\n"));
 	mShaders.push_back(new ShaderProgram("Resources//Shaders//skybox"));
 	mShaders.push_back(new ShaderProgram("Resources//Shaders//forward_ambient", "#define NORMAL_MAP\n"));
-	mShaders.push_back(new ShaderProgram("Resources//Shaders//forward_directional", "#define NORMAL_MAP\n"));
+	mShaders.push_back(new ShaderProgram("Resources//Shaders//forward_directional_tangent", "#define NORMAL_MAP"));
 	mShaders.push_back(new ShaderProgram("Resources//Shaders//forward_point", "#define NORMAL_MAP\n"));
 	mShaders.push_back(new ShaderProgram("Resources//Shaders//water"));
 	
 	mShaders[1]->bind();
-	mShaders[1]->setUniformVec3f("gLight.dir", glm::vec3(-1, -1, 1));
+	mShaders[1]->setUniformVec3f("gLight.dir", glm::normalize(glm::vec3(-1, -1, 1)));
 	mShaders[1]->setUniformFloat("gLight.intensity", 1);
 	mShaders[1]->setUniformVec3f("gLight.color", glm::vec3(1, 1, 1));
 	
@@ -94,7 +94,7 @@ bool Game::init()
 	mShaders[2]->setUniformVec3f("gLight.color", glm::vec3(1, 1, 1));
 
 	mShaders[4]->bind();
-	mShaders[4]->setUniformVec3f("gLight.dir", glm::vec3(-1, -1, 1));
+	mShaders[4]->setUniformVec3f("gLight.dir", glm::normalize(glm::vec3(-1, -1, 1)));
 	mShaders[4]->setUniformFloat("gLight.intensity", 1);
 	mShaders[4]->setUniformVec3f("gLight.color", glm::vec3(1, 1, 1));
 
@@ -104,9 +104,13 @@ bool Game::init()
 	mShaders[5]->setUniformVec3f("gLight.color", glm::vec3(1, 1, 1));
 
 	mShaders[8]->bind();
-	mShaders[8]->setUniformVec3f("gLight.dir", glm::vec3(-1, -1, 1));
+	mShaders[8]->setUniformVec3f("gLight.dir", glm::normalize(glm::vec3(-1, -1, 1)));
 	mShaders[8]->setUniformFloat("gLight.intensity", 1);
 	mShaders[8]->setUniformVec3f("gLight.color", glm::vec3(1, 1, 1));
+	mShaders[8]->setUniformFloat("gLight.gShineDamper", 5);
+	mShaders[8]->setUniformFloat("gLight.gSpecularFactor", 1);
+	mShaders[8]->setTextureLocation("textureSampler", 0);
+	mShaders[8]->setTextureLocation("gNormalMap", 1);
 
 	mShaders[9]->bind();
 	mShaders[9]->setUniformVec3f("gLight.pos", mCamera.mPosition);
@@ -179,6 +183,7 @@ void Game::renderScene(const glm::mat4& view, const glm::mat4& projection)
 
 	gTerrain3DTexture->bind();
 	mTextures[0]->bind();
+	mTextures[1]->bind(GL_TEXTURE1);
 
 	mShaders[3]->bind();
 	mShaders[3]->setUniformMat4f("M", glm::scale(glm::vec3(1, 1, 1)));
@@ -195,7 +200,7 @@ void Game::renderScene(const glm::mat4& view, const glm::mat4& projection)
 		mShaders[0]->setUniformMat4f("M", mEntities[i]);
 		mMeshes[2]->render();
 	}
-	mShaders[0]->setUniformMat4f("gModelMat", glm::mat4(1.0));
+	mShaders[0]->setUniformMat4f("M", glm::mat4(1.0));
 	mMeshes[1]->render();
 
 	glEnable(GL_BLEND);
@@ -219,7 +224,11 @@ void Game::renderScene(const glm::mat4& view, const glm::mat4& projection)
 		mShaders[1]->setUniformMat4f("gModelMat", mEntities[i]);
 		mMeshes[2]->render();
 	}
-	mShaders[1]->setUniformMat4f("gModelMat", glm::mat4(1.0));
+	mShaders[8]->bind();
+	mShaders[8]->setUniformMat4f("gViewMat", view);
+	mShaders[8]->setUniformMat4f("gProjectionMat", projection);
+	mShaders[8]->setUniformVec3f("gEyePos", mCamera.mPosition);
+	mShaders[8]->setUniformMat4f("gModelMat", glm::mat4(1.0));
 	mMeshes[1]->render();
 
 	mShaders[5]->bind();
@@ -241,7 +250,7 @@ void Game::renderScene(const glm::mat4& view, const glm::mat4& projection)
 		mMeshes[2]->render();
 	}
 	mShaders[2]->setUniformMat4f("gModelMat", glm::mat4(1.0));
-	mMeshes[1]->render();
+	//mMeshes[1]->render();
 
 	glDepthMask(true);
 	glDisable(GL_BLEND);

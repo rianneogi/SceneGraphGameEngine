@@ -1,0 +1,66 @@
+//#version 330 core
+ 
+#ifdef MULTI_TEXTURE
+in vec3 UV;
+#elif defined(SOLID_COLOR)
+in vec3 UV;
+#else
+in vec2 UV;
+#endif
+//in vec3 fragPos;
+//in vec3 fragNormal;
+//in vec3 fragTangent;
+//in vec3 fragBitangent;
+in vec3 lightDirection_tangentspace;
+in vec3 eyeVector_tangentspace;
+ 
+out vec4 color;
+ 
+#ifdef MULTI_TEXTURE
+uniform sampler2DArray textureSampler;
+#else
+uniform sampler2D textureSampler;
+#endif
+
+#ifdef NORMAL_MAP
+uniform sampler2D gNormalMap;
+#endif
+
+uniform mat4 gModelMat;
+uniform vec3 gEyePos;
+uniform float gSpecularFactor;
+uniform float gShineDamper;
+uniform struct Light {
+	vec3 dir;
+	vec3 color;
+	float intensity;
+} gLight;
+ 
+void main()
+{ 
+	//Normal = normalize(cross(dFdx(fragPos), dFdy(fragPos)))
+
+	#ifdef NORMAL_MAP
+	vec3 fragNormal = normalize((2.0*texture(gNormalMap, UV) - 1.0).rgb);
+	#else
+	vec3 fragNormal = vec3(0,0,1);
+	#endif
+
+    float diffuse = clamp( dot( fragNormal,-lightDirection_tangentspace ), 0,1 );
+	
+	//vec3 vertexPosition_worldspace = (gModelMat*vec4(fragPos,1)).xyz;
+	//vec3 eyeVector = normalize(gEyePos-vertexPosition_worldspace);
+	vec3 reflection = normalize(reflect(lightDirection_tangentspace,fragNormal));
+	float specular = clamp( dot(eyeVector_tangentspace,reflection), 0,1 );
+	//vec3 halfway = normalize(gLight.pos + eyeVector);
+	//float cosAlpha = clamp(normalize(dot(fragNormal,halfway)),0,1);
+	specular = pow(specular,gShineDamper)*gSpecularFactor;
+
+	//vec3 res = gLight.intensity*gLight.color*(diffuseVector + specularVector);
+
+    #ifdef SOLID_COLOR
+    color = vec4(res,1.0)*vec4(UV,1.0);
+	#else
+	color = gLight.intensity* (vec4(vec3(diffuse),1.0)*texture( textureSampler, UV ) + vec4(vec3(specular),1.0)*vec4(gLight.color,1.0));
+	#endif
+}

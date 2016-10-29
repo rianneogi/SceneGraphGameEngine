@@ -165,6 +165,8 @@
     <None Include="Resources\Shaders\forward_ambient.glvs" />
     <None Include="Resources\Shaders\forward_directional.glfs" />
     <None Include="Resources\Shaders\forward_directional.glvs" />
+    <None Include="Resources\Shaders\forward_directional_tangent.glfs" />
+    <None Include="Resources\Shaders\forward_directional_tangent.glvs" />
     <None Include="Resources\Shaders\forward_point.glfs" />
     <None Include="Resources\Shaders\forward_point.glvs" />
     <None Include="Resources\Shaders\phong.glfs" />
