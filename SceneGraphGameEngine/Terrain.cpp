@@ -28,7 +28,7 @@ glm::vec3 Terrain::calculateNormal(int x, int z)
 
 float Terrain::getHeight(int x, int z)
 {
-	return mHeightMap[x*mWidth + z];
+	return mHeightMap[x*(mWidth+2) + z];
 }
 
 float perlinOctaves(float i, float j)
@@ -57,7 +57,7 @@ void Terrain::generate()
 	{
 		for (int j = 0;j < mWidth+2;j++)
 		{
-			mHeightMap[i * mWidth + j] = perlinOctaves(mChunkPos.x*CONST_CHUNKSIZE+i, mChunkPos.y*CONST_CHUNKSIZE+j);
+			mHeightMap[i * (mWidth+2) + j] = perlinOctaves(mChunkPos.x*CONST_CHUNKSIZE+i, mChunkPos.y*CONST_CHUNKSIZE+j);
 		}
 	}
 
@@ -66,10 +66,10 @@ void Terrain::generate()
 		for (int j = 0;j < mWidth;j++)
 		{
 			int tex = 0;
-			if (j > 32)
+			/*if (j > 32)
 			{
 				tex = 3;
-			}
+			}*/
 			Vertices.push_back(VertexTexArray(glm::vec3(mChunkPos.x*CONST_BLOCKSIZE*CONST_CHUNKSIZE,0, mChunkPos.y*CONST_BLOCKSIZE*CONST_CHUNKSIZE) + 
 				glm::vec3(i, getHeight(i, j), j), glm::vec3(i,j,tex), calculateNormal(i+1, j+1)));
 		}
