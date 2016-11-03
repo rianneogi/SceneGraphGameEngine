@@ -1,6 +1,6 @@
 #include "MeshData.h"
 
-MeshData::MeshData()
+MeshDataTex::MeshDataTex()
 {
 	VB = 0;
 	IB = 0;
@@ -8,12 +8,12 @@ MeshData::MeshData()
 	MaterialIndex = 0;
 }
 
-MeshData::~MeshData()
+MeshDataTex::~MeshDataTex()
 {
 	clear();
 }
 
-void MeshData::clear()
+void MeshDataTex::clear()
 {
 	// Disable the two vertex array attributes.
 	/*glDisableVertexAttribArray(0);
@@ -29,7 +29,7 @@ void MeshData::clear()
 	glDeleteBuffers(1, &IB);
 }
 
-bool MeshData::init(const std::vector<Vertex>& Vertices, const std::vector<unsigned int>& Indices)
+bool MeshDataTex::init(const std::vector<Vertex>& Vertices, const std::vector<unsigned int>& Indices)
 {
 	clear();
 
@@ -56,7 +56,7 @@ bool MeshData::init(const std::vector<Vertex>& Vertices, const std::vector<unsig
 	return true;
 }
 
-void MeshData::render()
+void MeshDataTex::render()
 {
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);

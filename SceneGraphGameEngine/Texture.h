@@ -1,6 +1,6 @@
 #pragma once
 
-#include "GraphicsInclude.h"
+#include "Timer.h"
 
 ///Wrapper class for sf::Texture
 

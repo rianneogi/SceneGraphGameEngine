@@ -23,7 +23,7 @@ public:
 	bool InitMaterials(const aiScene* pScene, const std::string& Filename);
 	void clear();
 
-	std::vector<MeshData> mEntries;
+	std::vector<MeshDataTex> mEntries;
 	std::vector<Texture*> mTextures;
 
 private:

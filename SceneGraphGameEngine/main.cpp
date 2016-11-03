@@ -204,7 +204,7 @@ void mainLoop()
 		if (t >= 1000)
 		{
 			FPSTimer.restart();
-			printf("FPS: %d\n", frameCount);
+			printf("FPS: %d %f\n", frameCount, 1.0/frameCount);
 			frameCount = 0;
 		}
 

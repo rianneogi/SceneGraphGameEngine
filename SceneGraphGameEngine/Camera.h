@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Timer.h"
+#include "ShaderProgram.h"
 
 typedef std::vector<glm::vec4> Frustum;
 

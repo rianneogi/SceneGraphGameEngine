@@ -28,12 +28,18 @@ struct VertexSolidColor
 	VertexSolidColor(glm::vec3 p, glm::vec3 col, glm::vec3 n) : Pos(p), Color(col), Normal(n) {}
 };
 
-//Contains mesh data
 class MeshData
 {
 public:
-	MeshData();
-	~MeshData();
+	virtual void render() = 0;
+};
+
+//Contains mesh data
+class MeshDataTex : public MeshData
+{
+public:
+	MeshDataTex();
+	~MeshDataTex();
 
 	bool init(const std::vector<Vertex>& Vertices, const std::vector<unsigned int>& Indices);
 	void render();
@@ -46,7 +52,7 @@ public:
 };
 
 //Contains data of an array textured mesh
-class MeshDataTexArray
+class MeshDataTexArray : public MeshData
 {
 public:
 	MeshDataTexArray();
@@ -63,7 +69,7 @@ public:
 };
 
 //Contains data of a solid-colored mesh
-class MeshDataSolidColor
+class MeshDataSolidColor : public MeshData
 {
 public:
 	MeshDataSolidColor();

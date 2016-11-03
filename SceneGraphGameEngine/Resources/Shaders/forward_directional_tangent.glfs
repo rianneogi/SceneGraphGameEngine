@@ -7,10 +7,7 @@ in vec3 UV;
 #else
 in vec2 UV;
 #endif
-//in vec3 fragPos;
-//in vec3 fragNormal;
-//in vec3 fragTangent;
-//in vec3 fragBitangent;
+
 in vec3 lightDirection_tangentspace;
 in vec3 eyeVector_tangentspace;
  
@@ -26,7 +23,7 @@ uniform sampler2D textureSampler;
 uniform sampler2D gNormalMap;
 #endif
 
-#ifdef PARALAX_MAP
+#ifdef PARALLAX_MAP
 uniform sampler2D gDisplacementMap;
 #endif
 
@@ -44,7 +41,7 @@ void main()
 { 
 	//Normal = normalize(cross(dFdx(fragPos), dFdy(fragPos)))
 
-	#ifdef PARALAX_MAP
+	#ifdef PARALLAX_MAP
 	vec2 finalUV = UV + eyeVector_tangentspace.xy * texture(gDisplacementMap, UV).r *  0.1;
 	#else
 	vec2 finalUV = UV;
@@ -71,7 +68,6 @@ void main()
     #ifdef SOLID_COLOR
     color = vec4(res,1.0)*vec4(UV,1.0);
 	#else
-	
 	color = gLight.intensity* (vec4(vec3(diffuse),1.0)*texture( textureSampler, finalUV ) + vec4(vec3(specular),1.0)*vec4(gLight.color,1.0));
 	#endif
 }

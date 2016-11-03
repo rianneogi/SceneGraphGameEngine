@@ -124,10 +124,11 @@
     <ClInclude Include="GraphicsInclude.h" />
     <ClInclude Include="GraphicsTypedefs.h" />
     <ClInclude Include="LoadResources.h" />
+    <ClInclude Include="Material.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="MeshData.h" />
-    <ClInclude Include="MeshRenderer.h" />
     <ClInclude Include="Model.h" />
+    <ClInclude Include="Renderer.h" />
     <ClInclude Include="ShaderProgram.h" />
     <ClInclude Include="SkyBox.h" />
     <ClInclude Include="Terrain.h" />
@@ -146,10 +147,11 @@
     <ClCompile Include="GraphicsInclude.cpp" />
     <ClCompile Include="LoadResources.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Material.cpp" />
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="MeshData.cpp" />
-    <ClCompile Include="MeshRenderer.cpp" />
     <ClCompile Include="Model.cpp" />
+    <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="ShaderProgram.cpp" />
     <ClCompile Include="SkyBox.cpp" />
     <ClCompile Include="Terrain.cpp" />

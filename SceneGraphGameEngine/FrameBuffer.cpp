@@ -24,6 +24,7 @@ void FrameBuffer::bind()
 	glBindTexture(GL_TEXTURE_2D, NULL);
 	glBindFramebuffer(GL_FRAMEBUFFER, mFBO);
 	glViewport(0, 0, mWidth, mHeight);
+	printf("binding framebuffer %d\n", mFBO);
 }
 
 void FrameBuffer::unbind()

@@ -105,7 +105,7 @@ bool Mesh::InitMaterials(const aiScene* pScene, const std::string& Filename)
 	for (unsigned int i = 0; i < pScene->mNumMaterials; i++) 
 	{
 		const aiMaterial* pMaterial = pScene->mMaterials[i];
-
+		
 		mTextures[i] = NULL;
 		if (pMaterial->GetTextureCount(aiTextureType_DIFFUSE) > 0) 
 		{

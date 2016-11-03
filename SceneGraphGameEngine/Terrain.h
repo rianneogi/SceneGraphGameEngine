@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Water.h"
+#include "Model.h"
 
 extern float CONST_BLOCKSIZE;
 extern int CONST_CHUNKSIZE;

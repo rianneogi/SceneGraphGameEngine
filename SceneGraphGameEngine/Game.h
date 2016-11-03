@@ -1,6 +1,6 @@
 #pragma once
 
-#include "LoadResources.h"
+#include "Terrain.h"
 #include <map>
 
 class Game
@@ -12,10 +12,14 @@ public:
 	Camera mCamera;
 	SkyBox* mSkybox;
 
+	Renderer mRenderer;
+
 	glm::vec3 mSunDirection;
 
 	std::vector<ShaderProgram*> mShaders;
 	std::vector<Texture*> mTextures;
+	std::vector<Material*> mMaterials;
+	std::vector<Model*> mModels;
 	CubeMapTexture* mDayTexture;
 	CubeMapTexture* mNightTexture;
 	std::vector<Mesh*> mMeshes;

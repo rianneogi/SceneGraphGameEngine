@@ -21,12 +21,12 @@ out vec3 UV;
 out vec2 UV;
 #endif
  
-uniform mat4 M;
-uniform mat4 V;
-uniform mat4 P;
+uniform mat4 gModelMat;
+uniform mat4 gViewMat;
+uniform mat4 gProjectionMat;
  
 void main()
 { 
-    gl_Position =  P*V*M * vec4(vertexPosition_modelspace,1);
+    gl_Position =  gProjectionMat*gViewMat*gModelMat * vec4(vertexPosition_modelspace,1);
     UV = vertexUV;
 }

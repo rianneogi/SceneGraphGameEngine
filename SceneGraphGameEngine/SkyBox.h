@@ -10,10 +10,10 @@ public:
 	SkyBox(Mesh* mesh, CubeMapTexture* texture);
 	~SkyBox();
 
-	void render();
+	//void render();
 
 	Mesh* mMesh;
 	CubeMapTexture* mTexture;
-	glm::mat4 mModelMatrix;
+	ShaderProgram* mShader;
 };
 
