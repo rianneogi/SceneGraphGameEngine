@@ -19,12 +19,25 @@ FrameBuffer::~FrameBuffer()
 	printf("freeing FBO %d\n", mFBO);
 }
 
-void FrameBuffer::bind()
+void FrameBuffer::bindForWriting()
 {
 	glBindTexture(GL_TEXTURE_2D, NULL);
 	glBindFramebuffer(GL_FRAMEBUFFER, mFBO);
 	glViewport(0, 0, mWidth, mHeight);
-	printf("binding framebuffer %d\n", mFBO);
+	debugOpengl("binding framebuffer");
+	//printf("binding framebuffer %d\n", mFBO);
+}
+
+void FrameBuffer::bindColorTexture(GLenum target)
+{
+	glActiveTexture(target);
+	glBindTexture(GL_TEXTURE_2D, mColorTexture);
+}
+
+void FrameBuffer::bindDepthTexture(GLenum target)
+{
+	glActiveTexture(target);
+	glBindTexture(GL_TEXTURE_2D, mDepthTexture);
 }
 
 void FrameBuffer::unbind()

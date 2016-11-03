@@ -27,8 +27,21 @@ void Renderer::loadShaders()
 	mAmbientShaderTerrain = new ShaderProgram("Resources//Shaders//forward_ambient", "#define MULTI_TEXTURE\n");
 	mDirectionalShaderTerrain = new ShaderProgram("Resources//Shaders//forward_directional", "#define MULTI_TEXTURE\n");
 	mPointShaderTerrain = new ShaderProgram("Resources//Shaders//forward_point", "#define MULTI_TEXTURE\n");
-	mWaterShader = new ShaderProgram("Resources//Shaders//water");
 	mSkyboxShader = new ShaderProgram("Resources//Shaders//skybox");
+	
+	assert(mWater != NULL && mCamera != NULL);
+	mWaterShader = new ShaderProgram("Resources//Shaders//water");
+	mWaterShader->bind();
+	mWaterShader->setUniformFloat("gWaveStrength", mWater->mWaveStrength);
+	mWaterShader->setUniformFloat("gWaveHeight", mWater->mWaveHeight);
+	mWaterShader->setUniformFloat("gSpecularFactor", mWater->mSpecularFactor);
+	mWaterShader->setUniformFloat("gShineDamper", mWater->mShineDamper);
+	mWaterShader->setUniformFloat("gScreenNear", mCamera->mScreenNear);
+	mWaterShader->setUniformFloat("gScreenFar", mCamera->mScreenFar);
+	mWaterShader->setTextureLocation("gReflectionTexture", 0);
+	mWaterShader->setTextureLocation("gRefractionTexture", 1);
+	mWaterShader->setTextureLocation("gDuDv", 2);
+	mWaterShader->setTextureLocation("gDepthTexture", 3);
 }
 
 void Renderer::addMesh(MeshDataTex * mesh)
@@ -84,9 +97,8 @@ void Renderer::renderScene(const glm::mat4& view, const glm::mat4& projection)
 	glDepthMask(true);
 	glDisable(GL_BLEND);
 	glActiveTexture(GL_TEXTURE0);
-
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-
+	
 	renderSkybox(view, projection);
 
 	glDepthFunc(GL_LESS);
@@ -200,4 +212,39 @@ void Renderer::render()
 	glm::mat4 model, view, projection;
 	mCamera->render(view, projection);
 	renderScene(view, projection);
+
+	mCamera->mPosition = glm::vec3(mCamera->mPosition.x, -mCamera->mPosition.y, mCamera->mPosition.z);
+	mCamera->mVerticalAngle = -mCamera->mVerticalAngle;
+	mCamera->render(view, projection);
+	mWater->bindReflection();
+	renderScene(view, projection);
+
+	mCamera->mPosition = glm::vec3(mCamera->mPosition.x, -mCamera->mPosition.y, mCamera->mPosition.z);
+	mCamera->mVerticalAngle = -mCamera->mVerticalAngle;
+	mCamera->render(view, projection);
+	mWater->bindRefraction();
+	renderScene(view, projection);
+	mWater->mRefractionFBO.unbind();
+
+	renderScene(view, projection);
+
+	mWater->mReflectionFBO.bindColorTexture(GL_TEXTURE0);
+	mWater->mRefractionFBO.bindColorTexture(GL_TEXTURE1);
+	mWater->mDuDvTexture->bind(GL_TEXTURE2);
+	mWater->mRefractionFBO.bindDepthTexture(GL_TEXTURE3);
+
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glDepthMask(true);
+	glDepthFunc(GL_LESS);
+	
+	assert(mWaterShader != NULL);
+	mWaterShader->bind();
+	mWaterShader->setUniformMat4f("gModelMat", glm::scale(glm::vec3(160, 160, 160)));
+	mWaterShader->setUniformMat4f("gViewMat", view);
+	mWaterShader->setUniformMat4f("gProjectionMat", projection);
+	mWaterShader->setUniformFloat("gDuDvOffset", mWater->mDuDvOffset);
+	mWaterShader->setUniformVec3f("gEyePos", mCamera->mPosition);
+	mWaterShader->setUniformVec3f("gLightDir", mDirectionalLights[0].dir);
+	mWater->render();
 }

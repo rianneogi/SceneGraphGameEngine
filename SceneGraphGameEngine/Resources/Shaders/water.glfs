@@ -45,5 +45,6 @@ void main()
 
 	color = mix(refl, refr, clamp(dot(viewVector, normal),0,1)) + vec4(specular, specular, specular, 0.0);
 	color.a = depthFactor;
+
 	//color = vec4(finalDepth/50,finalDepth/50,finalDepth/50,1.0);
 }

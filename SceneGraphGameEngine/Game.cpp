@@ -58,8 +58,6 @@ bool Game::init()
 	mMeshes.push_back(new Mesh("Resources//Models//tree.obj"));
 	mMeshes.push_back(new Mesh("Resources//Models//plane.obj"));
 
-	mWater = new Water(mMeshes[3]);
-
 	mTextures.push_back(new Texture("Resources//Textures//alduin.jpg"));
 	mTextures.push_back(new Texture("Resources//Textures//alduin_n.jpg"));
 	mTextures.push_back(new Texture("Resources//Textures//Water//waterDUDV.png"));
@@ -71,9 +69,8 @@ bool Game::init()
 	mDayTexture->load("Resources//Textures//skybox//right.png", "Resources//Textures//skybox//left.png", "Resources//Textures//skybox//top.png",
 		"Resources//Textures//skybox//bottom.png",  "Resources//Textures//skybox//back.png", "Resources//Textures//skybox//front.png");
 
-	mRenderer.loadShaders();
 	mMaterials.push_back(new Material(mTextures[0], 1, 5));
-
+	
 	mModels.push_back(new Model());
 	mModels[0]->addMesh(mMeshes[1], mMaterials[0]);
 	mModels[0]->addToRenderer(&mRenderer);
@@ -84,6 +81,11 @@ bool Game::init()
 	mCamera.setPosition(glm::vec3(0, 0, 0));
 	mRenderer.mCamera = &mCamera;
 
+	mWater = new Water(mMeshes[3], mTextures[2]);
+	mRenderer.mWater = mWater;
+	
+	mRenderer.loadShaders();
+	
 	mRenderer.addDirectionalLight(DirectionalLight(glm::vec3(1, -1, -1), glm::vec3(1, 1, 1), 1));
 
 	updateChunks();
@@ -291,47 +293,47 @@ void Game::renderWithShadows(const glm::mat4 & view, const glm::mat4 & projectio
 
 void Game::render(SDL_Window* window)
 {
-//	glm::mat4 model, view, projection, view2, projection2;
-//	mCamera.render(view2, projection2);
-//
-//	glm::mat4 lightView = glm::lookAt(mCamera.mPosition-mSunDirection, mCamera.mPosition, glm::vec3(0, 1, 0));
-//	glm::ortho<float>(-2 * gSunDistance, 2 * gSunDistance, -2 * gSunDistance, 2 * gSunDistance, -2 * gSunDistance, 4 * gSunDistance);
-//
-//	mCamera.mPosition = glm::vec3(mCamera.mPosition.x, -mCamera.mPosition.y, mCamera.mPosition.z);
-//	mCamera.mVerticalAngle = -mCamera.mVerticalAngle;
-//	mCamera.render(view, projection);
-//	mWater->bindReflection();
-//	renderScene(view, projection);
-//
-//	mCamera.mPosition = glm::vec3(mCamera.mPosition.x, -mCamera.mPosition.y, mCamera.mPosition.z);
-//	mCamera.mVerticalAngle = -mCamera.mVerticalAngle;
-//	mCamera.render(view, projection);
-//	mWater->bindRefraction();
-//	renderScene(view, projection);
-//	assert(view == view2 && projection == projection2);
-//	mWater->mRefractionFBO.unbind();
-//	
-//	renderScene(view, projection);
-//
-//	glActiveTexture(GL_TEXTURE0);
-//	glBindTexture(GL_TEXTURE_2D, mWater->mReflectionFBO.mColorTexture);
-//	glActiveTexture(GL_TEXTURE1);
-//	glBindTexture(GL_TEXTURE_2D, mWater->mRefractionFBO.mColorTexture);
-//	mTextures[2]->bind(GL_TEXTURE2);
-//	glActiveTexture(GL_TEXTURE3);
-//	glBindTexture(GL_TEXTURE_2D, mWater->mRefractionFBO.mDepthTexture);
-//	
-//	glEnable(GL_BLEND);
-//	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-//
-//	mShaders[10]->bind();
-//	mShaders[10]->setUniformMat4f("gModelMat", glm::translate(glm::scale(glm::vec3(160, 160, 160)), glm::vec3(1,0,1)));
-//	mShaders[10]->setUniformMat4f("gViewMat", view);
-//	mShaders[10]->setUniformMat4f("gProjectionMat", projection);
-//	mShaders[10]->setUniformFloat("gDuDvOffset", mWater->mDuDvOffset);
-//	mShaders[10]->setUniformVec3f("gEyePos", mCamera.mPosition);
-//	mShaders[10]->setUniformVec3f("gLightDir", glm::vec3(-1, -1, 1));
-//	mWater->render();
+	/*glm::mat4 model, view, projection, view2, projection2;
+	mCamera.render(view2, projection2);
+
+	glm::mat4 lightView = glm::lookAt(mCamera.mPosition-mSunDirection, mCamera.mPosition, glm::vec3(0, 1, 0));
+	glm::ortho<float>(-2 * gSunDistance, 2 * gSunDistance, -2 * gSunDistance, 2 * gSunDistance, -2 * gSunDistance, 4 * gSunDistance);
+
+	mCamera.mPosition = glm::vec3(mCamera.mPosition.x, -mCamera.mPosition.y, mCamera.mPosition.z);
+	mCamera.mVerticalAngle = -mCamera.mVerticalAngle;
+	mCamera.render(view, projection);
+	mWater->bindReflection();
+	renderScene(view, projection);
+
+	mCamera.mPosition = glm::vec3(mCamera.mPosition.x, -mCamera.mPosition.y, mCamera.mPosition.z);
+	mCamera.mVerticalAngle = -mCamera.mVerticalAngle;
+	mCamera.render(view, projection);
+	mWater->bindRefraction();
+	renderScene(view, projection);
+	assert(view == view2 && projection == projection2);
+	mWater->mRefractionFBO.unbind();
+	
+	renderScene(view, projection);
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, mWater->mReflectionFBO.mColorTexture);
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, mWater->mRefractionFBO.mColorTexture);
+	mTextures[2]->bind(GL_TEXTURE2);
+	glActiveTexture(GL_TEXTURE3);
+	glBindTexture(GL_TEXTURE_2D, mWater->mRefractionFBO.mDepthTexture);
+	
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	mShaders[10]->bind();
+	mShaders[10]->setUniformMat4f("gModelMat", glm::translate(glm::scale(glm::vec3(160, 160, 160)), glm::vec3(1,0,1)));
+	mShaders[10]->setUniformMat4f("gViewMat", view);
+	mShaders[10]->setUniformMat4f("gProjectionMat", projection);
+	mShaders[10]->setUniformFloat("gDuDvOffset", mWater->mDuDvOffset);
+	mShaders[10]->setUniformVec3f("gEyePos", mCamera.mPosition);
+	mShaders[10]->setUniformVec3f("gLightDir", glm::vec3(-1, -1, 1));
+	mWater->render();*/
 
 	mRenderer.render();
 }

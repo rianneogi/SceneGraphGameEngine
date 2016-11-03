@@ -1,9 +1,10 @@
 #include "Water.h"
 
-Water::Water(Mesh* mesh)
+Water::Water(Mesh* mesh, Texture* tex)
 {
 	mModelMat = glm::mat4(1.0);
 	mMesh = mesh;
+	mDuDvTexture = tex;
 
 	mReflectionFBO.initFBO(SCREEN_WIDTH, SCREEN_HEIGHT, GL_COLOR_ATTACHMENT0);
 	mReflectionFBO.createColorTextureAttachment();
@@ -45,11 +46,11 @@ void Water::render()
 
 void Water::bindReflection()
 {
-	mReflectionFBO.bind();
+	mReflectionFBO.bindForWriting();
 }
 
 void Water::bindRefraction()
 {
-	mRefractionFBO.bind();
+	mRefractionFBO.bindForWriting();
 }
 

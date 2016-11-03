@@ -19,7 +19,9 @@ public:
 	FrameBuffer();
 	~FrameBuffer();
 
-	void bind();
+	void bindForWriting();
+	void bindColorTexture(GLenum target);
+	void bindDepthTexture(GLenum target);
 	void unbind();
 
 	void initFBO(int width, int height, GLenum drawbuffer);
