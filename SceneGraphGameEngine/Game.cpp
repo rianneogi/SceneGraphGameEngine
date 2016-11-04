@@ -62,17 +62,19 @@ bool Game::init()
 	mTextures.push_back(new Texture("Resources//Textures//alduin_n.jpg"));
 	mTextures.push_back(new Texture("Resources//Textures//Water//waterDUDV.png"));
 	mTextures.push_back(new Texture("Resources//Textures//brick_color.png"));
-	mTextures.push_back(new Texture("Resources//Textures//brick_normal.png"));
+	mTextures.push_back(new Texture("Resources//Textures//brick2_normal.png"));
 	mTextures.push_back(new Texture("Resources//Textures//brick_disp.png"));
 	
 	mDayTexture = new CubeMapTexture();
 	mDayTexture->load("Resources//Textures//skybox//right.png", "Resources//Textures//skybox//left.png", "Resources//Textures//skybox//top.png",
 		"Resources//Textures//skybox//bottom.png",  "Resources//Textures//skybox//back.png", "Resources//Textures//skybox//front.png");
 
-	mMaterials.push_back(new Material(mTextures[0], 1, 5));
+	mMaterials.push_back(new Material(mTextures[3], 1, 5));
+	mMaterials[0]->mNormalMap = mTextures[4];
 	
 	mModels.push_back(new Model());
-	mModels[0]->addMesh(mMeshes[1], mMaterials[0]);
+	mModels[0]->addMesh(mMeshes[0], mMaterials[0]);
+	mModels[0]->mModelMatrix = glm::scale(glm::mat4(1.0),glm::vec3(50,50,50));
 	mModels[0]->addToRenderer(&mRenderer);
 
 	mSkybox = new SkyBox(mMeshes[0], mDayTexture);

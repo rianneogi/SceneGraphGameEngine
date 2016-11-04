@@ -7,6 +7,8 @@ class Material
 public:
 	Texture* mTexture;
 	Texture* mNormalMap;
+	Texture* mDisplacementMap;
+	Texture* mSpecularMap;
 	float mSpecularIntensity;
 	float mShineDamper;
 

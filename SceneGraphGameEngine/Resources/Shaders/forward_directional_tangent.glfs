@@ -14,9 +14,9 @@ in vec3 eyeVector_tangentspace;
 out vec4 color;
  
 #ifdef MULTI_TEXTURE
-uniform sampler2DArray textureSampler;
+uniform sampler2DArray gTexture;
 #else
-uniform sampler2D textureSampler;
+uniform sampler2D gTexture;
 #endif
 
 #ifdef NORMAL_MAP
@@ -68,6 +68,6 @@ void main()
     #ifdef SOLID_COLOR
     color = vec4(res,1.0)*vec4(UV,1.0);
 	#else
-	color = gLight.intensity* (vec4(vec3(diffuse),1.0)*texture( textureSampler, finalUV ) + vec4(vec3(specular),1.0)*vec4(gLight.color,1.0));
+	color = gLight.intensity* (vec4(vec3(diffuse),1.0)*texture( gTexture, finalUV ) + vec4(vec3(specular),1.0)*vec4(gLight.color,1.0));
 	#endif
 }

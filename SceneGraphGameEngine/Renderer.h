@@ -1,17 +1,19 @@
 #pragma once
 
 #include "Water.h"
+#include <map>
 
-enum SHADER_PIPELINE {NONE = 0, MULTI_TEXTURE = 1, SOLID_COLOR = 2, NORMAL_MAP = 4, PARALLAX_MAP = 8, SPECULAR_MAP = 16, SKYBOX = 32, WATER = 64};
+enum SHADER_TYPE {NONE = 0, MULTI_TEXTURE = 1, SOLID_COLOR = 2, NORMAL_MAP = 4, PARALLAX_MAP = 8, SPECULAR_MAP = 16, SKYBOX = 32, WATER = 64,
+DIRECTIONAL=128, POINT=256, AMBIENT=512};
 
 struct RenderObject
 {
 	Mesh* mMesh;
 	Material* mMaterial;
-	SHADER_PIPELINE mShader;
+	int mShader;
 	glm::mat4* mModelMat;
 	RenderObject() : mMesh(NULL), mMaterial(NULL), mShader(NONE), mModelMat(NULL) {};
-	RenderObject(Mesh* mesh, Material* mat, SHADER_PIPELINE shader, glm::mat4* model ) : 
+	RenderObject(Mesh* mesh, Material* mat, int shader, glm::mat4* model ) : 
 		mMesh(mesh), mMaterial(mat), mShader(shader), mModelMat(model) {};
 };
 
@@ -38,21 +40,23 @@ class Renderer
 public:
 	std::vector<MeshDataTex*> mMeshes;
 	std::vector<Texture*> mTextures;
-	std::vector<ShaderProgram*> mShaders;
+	//std::vector<ShaderProgram*> mShaders;
+	std::map<int, ShaderProgram*> mShaders;
+	std::map<int, std::vector<RenderObject>> mRenderables;
 
 	std::vector<RenderObject> mRenderObjects;
 
 	std::vector<DirectionalLight> mDirectionalLights;
 	std::vector<PointLight> mPointLights;
 
-	ShaderProgram* mAmbientShader;
+	/*ShaderProgram* mAmbientShader;
 	ShaderProgram* mDirectionalShader;
 	ShaderProgram* mPointShader;
 	ShaderProgram* mAmbientShaderTerrain;
 	ShaderProgram* mDirectionalShaderTerrain;
 	ShaderProgram* mPointShaderTerrain;
 	ShaderProgram* mSkyboxShader;
-	ShaderProgram* mWaterShader;
+	ShaderProgram* mWaterShader;*/
 
 	Water* mWater;
 	FrameBuffer mShadowFBO;
@@ -68,13 +72,15 @@ public:
 
 	void addMesh(MeshDataTex* mesh);
 	void addTexture(Texture* tex);
-	void addShader(ShaderProgram* shader);
-	void addRenderObject(Mesh * mesh, Material * tex, SHADER_PIPELINE shader, glm::mat4 * model);
+	void addRenderObject(Mesh * mesh, Material * tex, int shader, glm::mat4 * model);
 	void addPointLight(const PointLight& l);
 	void addDirectionalLight(const DirectionalLight& l);
 
 	void renderSkybox(const glm::mat4& view, const glm::mat4& projection);
+	void renderShader(int shader, const glm::mat4& view, const glm::mat4& projection);
 	void renderScene(const glm::mat4& view, const glm::mat4& projection);
 	void render();
 };
+
+std::string getDefsFromShaderType(int shader);
 

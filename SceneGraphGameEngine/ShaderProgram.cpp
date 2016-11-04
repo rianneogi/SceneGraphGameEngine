@@ -167,7 +167,7 @@ bool ShaderProgram::loadProgram(std::string path, std::string defs)
 	//Generate program
 	mProgramID = glCreateProgram();
 
-	printf("creating shader program, id: %d, path: %s\n", mProgramID, path.c_str());
+	printf("creating shader program, id: %d, path: %s, defs: %s\n", mProgramID, path.c_str(), defs.c_str());
 	
 
 	//Load vertex shader

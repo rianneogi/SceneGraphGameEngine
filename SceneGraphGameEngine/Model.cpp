@@ -31,7 +31,7 @@ void Model::addToRenderer(Renderer* renderer)
 {
 	for (size_t i = 0; i < mMeshes.size(); i++)
 	{
-		renderer->addRenderObject(mMeshes[i], mMaterials[i], NONE, &mModelMatrix);
+		renderer->addRenderObject(mMeshes[i], mMaterials[i], NORMAL_MAP, &mModelMatrix);
 	}
 }
 
