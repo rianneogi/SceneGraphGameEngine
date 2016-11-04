@@ -67,7 +67,7 @@ void Terrain::generate()
 				tex = 3;
 			}*/
 			Vertices.push_back(VertexTexArray(glm::vec3(mChunkPos.x*CONST_BLOCKSIZE*CONST_CHUNKSIZE,0, mChunkPos.y*CONST_BLOCKSIZE*CONST_CHUNKSIZE) + 
-				glm::vec3(i, getHeight(i, j), j), glm::vec3(i,j,tex), calculateNormal(i+1, j+1)));
+				glm::vec3(i, getHeight(i, j), j), glm::vec3(i,j,tex), calculateNormal(i+1, j+1), glm::vec3(1,0,0)));
 		}
 	}
 

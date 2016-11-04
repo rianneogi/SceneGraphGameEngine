@@ -263,12 +263,13 @@ void MeshDataTexArray::render()
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
 	glEnableVertexAttribArray(2);
-	//glEnableVertexAttribArray(3);
+	glEnableVertexAttribArray(3);
 
 	glBindBuffer(GL_ARRAY_BUFFER, VB);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(VertexTexArray), (const GLvoid*)offsetof(VertexTexArray, Pos));
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(VertexTexArray), (const GLvoid*)offsetof(VertexTexArray, UV));
 	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(VertexTexArray), (const GLvoid*)offsetof(VertexTexArray, Normal));
+	glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(VertexTexArray), (const GLvoid*)offsetof(VertexTexArray, Tangent));
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IB);
 	//const unsigned int MaterialIndex = m_Entries[i].MaterialIndex;
@@ -281,11 +282,10 @@ void MeshDataTexArray::render()
 
 	debugOpengl("DRAW ERROR tex array");
 
-	//debugOpengl("mesh entry 2d array draw");
 	glDisableVertexAttribArray(0);
 	glDisableVertexAttribArray(1);
 	glDisableVertexAttribArray(2);
-	//glDisableVertexAttribArray(3);
+	glDisableVertexAttribArray(3);
 }
 
 MeshDataSolidColor::MeshDataSolidColor()

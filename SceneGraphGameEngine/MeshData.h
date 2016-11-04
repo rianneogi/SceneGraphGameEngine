@@ -21,7 +21,8 @@ struct VertexTexArray
 	glm::vec3 Pos;
 	glm::vec3 UV;
 	glm::vec3 Normal;
-	VertexTexArray(glm::vec3 p, glm::vec3 uv, glm::vec3 n) : Pos(p), UV(uv), Normal(n) {}
+	glm::vec3 Tangent;
+	VertexTexArray(glm::vec3 p, glm::vec3 uv, glm::vec3 n, glm::vec3 t) : Pos(p), UV(uv), Normal(n), Tangent(t) {}
 };
 
 struct VertexSolidColor
