@@ -3,7 +3,7 @@
 #include "TextureArray.h"
 
 //Contains texture data for a 6 sided cube
-class CubeMapTexture
+class CubeMapTexture : public Texture
 {
 public:
 	CubeMapTexture();

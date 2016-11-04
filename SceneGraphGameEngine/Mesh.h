@@ -1,9 +1,6 @@
 #pragma once
 
 #include "MeshData.h"
-#include <assimp/Importer.hpp>
-#include <assimp/scene.h>           // Output data structure
-#include <assimp/postprocess.h>     // Post processing flags
 
 //Contains functionality to combine multiple mesh data and import meshes from assimp 
 class Mesh
@@ -24,7 +21,7 @@ public:
 	void clear();
 
 	std::vector<MeshDataTex> mEntries;
-	std::vector<Texture*> mTextures;
+	std::vector<Texture2D*> mTextures;
 
 private:
 	#define INVALID_MATERIAL 0xFFFFFFFF

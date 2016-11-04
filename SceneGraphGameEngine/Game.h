@@ -1,13 +1,15 @@
 #pragma once
 
 #include "Terrain.h"
-#include <map>
 
 class Game
 {
 public:
 	Game();
 	~Game();
+
+	bool loadTileTexture(std::string path);
+	bool loadTextures();
 
 	Camera mCamera;
 	SkyBox* mSkybox;
@@ -16,13 +18,18 @@ public:
 
 	glm::vec3 mSunDirection;
 
-	std::vector<ShaderProgram*> mShaders;
-	std::vector<Texture*> mTextures;
+	std::vector<Texture2D*> mTextures;
 	std::vector<Material*> mMaterials;
+	std::vector<MeshDataTex*> mMeshes;
 	std::vector<Model*> mModels;
+
+	std::vector<Texture2D*> mTileTextures;
+	TextureArray* mTerrainTexture;
+	Material* mTerrainMaterial;
+
 	CubeMapTexture* mDayTexture;
 	CubeMapTexture* mNightTexture;
-	std::vector<Mesh*> mMeshes;
+	
 	FrameBuffer mShadowFBO;
 
 	Water* mWater;

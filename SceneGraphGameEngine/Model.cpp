@@ -21,7 +21,7 @@ Model::~Model()
 //	}
 //}
 
-void Model::addMesh(Mesh* mesh, Material* tex)
+void Model::addMesh(MeshDataTex* mesh, Material* tex)
 {
 	mMeshes.push_back(mesh);
 	mMaterials.push_back(tex);
@@ -31,7 +31,21 @@ void Model::addToRenderer(Renderer* renderer)
 {
 	for (size_t i = 0; i < mMeshes.size(); i++)
 	{
-		renderer->addRenderObject(mMeshes[i], mMaterials[i], NORMAL_MAP, &mModelMatrix);
+		int shader = NONE;
+		if (mMaterials[i]->mNormalMap != NULL)
+		{
+			shader |= NORMAL_MAP;
+		}
+		if (mMaterials[i]->mDisplacementMap != NULL)
+		{
+			shader |= PARALLAX_MAP;
+		}
+		if (mMaterials[i]->mSpecularMap != NULL)
+		{
+			shader |= SPECULAR_MAP;
+		}
+
+		renderer->addRenderObject(mMeshes[i], mMaterials[i], shader, &mModelMatrix);
 	}
 }
 

@@ -4,7 +4,7 @@ SkyBox::SkyBox() : mMesh(NULL), mTexture(NULL), mShader(NULL)
 {
 }
 
-SkyBox::SkyBox(Mesh* mesh, CubeMapTexture* texture) : mMesh(mesh), mTexture(texture)
+SkyBox::SkyBox(MeshDataTex* mesh, CubeMapTexture* texture) : mMesh(mesh), mTexture(texture)
 {
 }
 

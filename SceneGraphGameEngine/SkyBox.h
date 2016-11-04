@@ -5,15 +5,15 @@
 class SkyBox
 {
 public:
+	MeshDataTex* mMesh;
+	CubeMapTexture* mTexture;
+	ShaderProgram* mShader;
+
 	SkyBox();
 	SkyBox(const SkyBox& other);
-	SkyBox(Mesh* mesh, CubeMapTexture* texture);
+	SkyBox(MeshDataTex* mesh, CubeMapTexture* texture);
 	~SkyBox();
 
 	//void render();
-
-	Mesh* mMesh;
-	CubeMapTexture* mTexture;
-	ShaderProgram* mShader;
 };
 

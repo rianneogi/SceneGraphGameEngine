@@ -49,12 +49,12 @@ void Renderer::addMesh(MeshDataTex * mesh)
 	mMeshes.push_back(mesh);
 }
 
-void Renderer::addTexture(Texture * tex)
+void Renderer::addTexture(Texture2D * tex)
 {
 	mTextures.push_back(tex);
 }
 
-void Renderer::addRenderObject(Mesh * mesh, Material * tex, int shader, glm::mat4* model)
+void Renderer::addRenderObject(MeshData * mesh, Material * tex, int shader, glm::mat4* model)
 {
 	RenderObject ro = RenderObject(mesh, tex, shader, model);
 	mRenderObjects.push_back(ro);
@@ -117,7 +117,7 @@ void Renderer::renderSkybox(const glm::mat4& view, const glm::mat4& projection)
 
 void Renderer::renderShader(int shader, const glm::mat4& view, const glm::mat4& projection)
 {
-	if (mShaders.count(shader) == 0)
+	if (mShaders.count(shader) == 0 || mRenderables[shader].size() == 0)
 	{
 		return;
 	}
@@ -214,14 +214,18 @@ void Renderer::renderScene(const glm::mat4& view, const glm::mat4& projection)
 
 	renderShader(AMBIENT, view, projection);
 	renderShader(AMBIENT | NORMAL_MAP, view, projection);
+	renderShader(AMBIENT | MULTI_TEXTURE, view, projection);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_ONE, GL_ONE);
 	glDepthMask(false);
 	glDepthFunc(GL_EQUAL);
 	renderShader(DIRECTIONAL, view, projection);
 	renderShader(DIRECTIONAL | NORMAL_MAP, view, projection);
+	renderShader(DIRECTIONAL | MULTI_TEXTURE, view, projection);
+
 	renderShader(POINT, view, projection);
-	//renderShader(POINT | NORMAL_MAP, view, projection);
+	renderShader(POINT | NORMAL_MAP, view, projection);
+	renderShader(POINT | MULTI_TEXTURE, view, projection);
 
 	/*mDirectionalShader->bind();
 	mDirectionalShader->setUniformMat4f("gViewMat", view);

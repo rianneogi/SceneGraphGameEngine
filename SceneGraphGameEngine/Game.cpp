@@ -4,6 +4,10 @@
 float gSpeed = 0.25f;
 float gMouseSpeed = 0.0075f;
 
+const int TEXTURE_WIDTH = 16;
+const int TEXTURE_HEIGHT = 16;
+const int BYTES_PER_TEXEL = 4;
+
 Game::Game()
 {
 	mDayTexture = NULL;
@@ -14,11 +18,11 @@ Game::Game()
 
 Game::~Game()
 {
-	/*for (int i = 0;i < gTileTextures.size();i++)
+	for (int i = 0;i < mTileTextures.size();i++)
 	{
-		if (gTileTextures[i] != NULL)
-			delete gTileTextures[i];
-	}*/
+		if (mTileTextures[i] != NULL)
+			delete mTileTextures[i];
+	}
 	for (int i = 0;i < mMeshes.size();i++)
 	{
 		if (mMeshes[i] != NULL)
@@ -29,17 +33,21 @@ Game::~Game()
 		if (mTextures[i] != NULL)
 			delete mTextures[i];
 	}
-	for (int i = 0;i < mShaders.size();i++)
+	/*for (int i = 0;i < mShaders.size();i++)
 	{
 		if (mShaders[i] != NULL)
 			delete mShaders[i];
-	}
+	}*/
 	/*if (mTerrain != NULL)
 		delete mTerrain;*/
 	//if (gTerrain3DTexture != NULL)
 	//	delete gTerrain3DTexture;
 	if (mDayTexture != NULL)
 		delete mDayTexture;
+	if (mNightTexture != NULL)
+		delete mNightTexture;
+	if (mTerrainTexture != NULL)
+		delete mTerrainTexture;
 
 	for (auto i = mTerrainChunks.begin(); i != mTerrainChunks.end(); i++)
 	{
@@ -48,33 +56,59 @@ Game::~Game()
 	}
 }
 
+bool Game::loadTileTexture(std::string path)
+{
+	mTileTextures.push_back(new Texture2D());
+	if (!mTileTextures[mTileTextures.size() - 1]->loadFromFile(path))
+	{
+		printf("Unable to load texture: %s\n", path);
+		return false;
+	}
+	return true;
+}
+
+bool Game::loadTextures()
+{
+	bool res = loadTileTexture("Resources\\Textures\\cobblestone.png");
+	res = res && loadTileTexture("Resources\\Textures\\dirt.png");
+	res = res && loadTileTexture("Resources\\Textures\\brick.png");
+	res = res && loadTileTexture("Resources\\Textures\\sand.png");
+
+	mTerrainTexture = new TextureArray();
+	res = res && mTerrainTexture->loadFromFile(mTileTextures, TEXTURE_WIDTH, TEXTURE_HEIGHT, BYTES_PER_TEXEL);
+
+	mTerrainMaterial = new Material(mTerrainTexture, 1, 5);
+
+	return res;
+}
+
 bool Game::init()
 {
 	srand(time(0));
-	//loadTextures();
+	loadTextures();
 
-	mMeshes.push_back(new Mesh("Resources//Models//cube2.obj"));
-	mMeshes.push_back(new Mesh("Resources//Models//alduin.obj"));
-	mMeshes.push_back(new Mesh("Resources//Models//tree.obj"));
-	mMeshes.push_back(new Mesh("Resources//Models//plane.obj"));
+	mMeshes.push_back(new MeshDataTex("Resources//Models//cube2.obj"));
+	mMeshes.push_back(new MeshDataTex("Resources//Models//alduin.obj"));
+	mMeshes.push_back(new MeshDataTex("Resources//Models//tree.obj"));
+	mMeshes.push_back(new MeshDataTex("Resources//Models//plane.obj"));
 
-	mTextures.push_back(new Texture("Resources//Textures//alduin.jpg"));
-	mTextures.push_back(new Texture("Resources//Textures//alduin_n.jpg"));
-	mTextures.push_back(new Texture("Resources//Textures//Water//waterDUDV.png"));
-	mTextures.push_back(new Texture("Resources//Textures//brick_color.png"));
-	mTextures.push_back(new Texture("Resources//Textures//brick2_normal.png"));
-	mTextures.push_back(new Texture("Resources//Textures//brick_disp.png"));
+	mTextures.push_back(new Texture2D("Resources//Textures//alduin.jpg"));
+	mTextures.push_back(new Texture2D("Resources//Textures//alduin_n.jpg"));
+	mTextures.push_back(new Texture2D("Resources//Textures//Water//waterDUDV.png"));
+	mTextures.push_back(new Texture2D("Resources//Textures//brick_color.png"));
+	mTextures.push_back(new Texture2D("Resources//Textures//brick_normal.png"));
+	mTextures.push_back(new Texture2D("Resources//Textures//brick_disp.png"));
 	
 	mDayTexture = new CubeMapTexture();
 	mDayTexture->load("Resources//Textures//skybox//right.png", "Resources//Textures//skybox//left.png", "Resources//Textures//skybox//top.png",
 		"Resources//Textures//skybox//bottom.png",  "Resources//Textures//skybox//back.png", "Resources//Textures//skybox//front.png");
 
-	mMaterials.push_back(new Material(mTextures[3], 1, 5));
-	mMaterials[0]->mNormalMap = mTextures[4];
+	mMaterials.push_back(new Material(mTextures[0], 1, 5));
+	mMaterials[0]->mNormalMap = mTextures[1];
 	
 	mModels.push_back(new Model());
-	mModels[0]->addMesh(mMeshes[0], mMaterials[0]);
-	mModels[0]->mModelMatrix = glm::scale(glm::mat4(1.0),glm::vec3(50,50,50));
+	mModels[0]->addMesh(mMeshes[1], mMaterials[0]);
+	mModels[0]->mModelMatrix = glm::scale(glm::mat4(1.0),glm::vec3(1,1,1));
 	mModels[0]->addToRenderer(&mRenderer);
 
 	mSkybox = new SkyBox(mMeshes[0], mDayTexture);
@@ -358,9 +392,10 @@ void Game::updateChunks()
 			std::string id = getChunkString(i, j);
 			if (mTerrainChunks.count(id) == 0)
 			{
-				mTerrainChunks[id] = new Terrain(i, j);
+				mTerrainChunks[id] = new Terrain(i, j, mTerrainMaterial);
 				mTerrainChunks[id]->generate();
 				printf("Generating chunk id: %s\n", id.c_str());
+				mTerrainChunks[id]->addToRenderer(&mRenderer);
 			}
 		}
 	}

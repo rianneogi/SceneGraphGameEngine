@@ -13,7 +13,7 @@ TextureArray::~TextureArray()
 	freeTexture();
 }
 
-bool TextureArray::loadFromFile(std::vector<Texture*> textures, unsigned int width, unsigned int height, unsigned int bpt)
+bool TextureArray::loadFromFile(std::vector<Texture2D*> textures, unsigned int width, unsigned int height, unsigned int bpt)
 {
 	mHeight = height;
 	mWidth = width;

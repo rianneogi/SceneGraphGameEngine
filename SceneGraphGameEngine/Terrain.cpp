@@ -3,16 +3,12 @@
 float CONST_BLOCKSIZE = 1.0f;
 int CONST_CHUNKSIZE = 128;
 
-Terrain::Terrain()
+Terrain::Terrain() : mMesh(NULL), mMaterial(NULL), mChunkPos(0,0), mModelMat(1.0)
 {
-	mMesh = NULL;
-	mChunkPos = Vector2i(0, 0);
 }
 
-Terrain::Terrain(int i, int j)
+Terrain::Terrain(int i, int j, Material* mat) : mMesh(NULL), mMaterial(mat), mChunkPos(i, j), mModelMat(1.0)
 {
-	mMesh = NULL;
-	mChunkPos = Vector2i(i, j);
 }
 
 Terrain::~Terrain()
@@ -95,4 +91,9 @@ void Terrain::generate()
 void Terrain::render()
 {
 	mMesh->render();
+}
+
+void Terrain::addToRenderer(Renderer* renderer)
+{
+	renderer->addRenderObject(mMesh, mMaterial, MULTI_TEXTURE, &mModelMat);
 }

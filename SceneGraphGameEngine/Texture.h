@@ -7,9 +7,16 @@
 class Texture
 {
 public:
-	Texture();
-	Texture(std::string file);
-	~Texture();
+	virtual void bind() = 0;
+	virtual void bind(GLenum textureunit) = 0;
+};
+
+class Texture2D : public Texture
+{
+public:
+	Texture2D();
+	Texture2D(std::string file);
+	~Texture2D();
 
 	bool loadFromFile(std::string path);
 	bool loadTextureFromPixels32(GLuint* pixels, GLuint width, GLuint height);

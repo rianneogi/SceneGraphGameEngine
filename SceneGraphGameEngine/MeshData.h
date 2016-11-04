@@ -3,6 +3,10 @@
 #include "FrameBuffer.h"
 #include "GraphicsTypedefs.h"
 
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>           // Output data structure
+#include <assimp/postprocess.h>     // Post processing flags
+
 struct Vertex
 {
 	glm::vec3 Pos;
@@ -39,11 +43,19 @@ class MeshDataTex : public MeshData
 {
 public:
 	MeshDataTex();
+	MeshDataTex(std::string file);
 	~MeshDataTex();
+
+	bool loadFromFile(const std::string& Filename);
+
+	bool InitFromScene(const aiScene* pScene, const std::string& Filename);
+	void InitMesh(unsigned int Index, const aiMesh* paiMesh, std::vector<Vertex>& Vertices, std::vector<unsigned int>& Indices);
+	//bool InitMaterials(const aiScene* pScene, const std::string& Filename);
+	void clear();
 
 	bool init(const std::vector<Vertex>& Vertices, const std::vector<unsigned int>& Indices);
 	void render();
-	void clear();
+	//void clear();
 
 	GLuint VB;
 	GLuint IB;

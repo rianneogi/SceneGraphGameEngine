@@ -1,6 +1,6 @@
 #include "Water.h"
 
-Water::Water(Mesh* mesh, Texture* tex)
+Water::Water(MeshDataTex* mesh, Texture2D* tex)
 {
 	mModelMat = glm::mat4(1.0);
 	mMesh = mesh;

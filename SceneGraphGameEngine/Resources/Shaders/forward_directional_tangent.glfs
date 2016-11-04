@@ -42,9 +42,21 @@ void main()
 	//Normal = normalize(cross(dFdx(fragPos), dFdy(fragPos)))
 
 	#ifdef PARALLAX_MAP
+
+	#ifdef MULTI_TEXTURE
+	vec3 finalUV = UV + eyeVector_tangentspace.xy * texture(gDisplacementMap, UV).r *  0.1;
+	#else
 	vec2 finalUV = UV + eyeVector_tangentspace.xy * texture(gDisplacementMap, UV).r *  0.1;
+	#endif
+
+	#else
+
+	#ifdef MULTI_TEXTURE
+	vec3 finalUV = UV;
 	#else
 	vec2 finalUV = UV;
+	#endif
+
 	#endif
 
 	#ifdef NORMAL_MAP

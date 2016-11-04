@@ -8,12 +8,12 @@ DIRECTIONAL=128, POINT=256, AMBIENT=512};
 
 struct RenderObject
 {
-	Mesh* mMesh;
+	MeshData* mMesh;
 	Material* mMaterial;
 	int mShader;
 	glm::mat4* mModelMat;
 	RenderObject() : mMesh(NULL), mMaterial(NULL), mShader(NONE), mModelMat(NULL) {};
-	RenderObject(Mesh* mesh, Material* mat, int shader, glm::mat4* model ) : 
+	RenderObject(MeshData* mesh, Material* mat, int shader, glm::mat4* model ) :
 		mMesh(mesh), mMaterial(mat), mShader(shader), mModelMat(model) {};
 };
 
@@ -39,7 +39,7 @@ class Renderer
 {
 public:
 	std::vector<MeshDataTex*> mMeshes;
-	std::vector<Texture*> mTextures;
+	std::vector<Texture2D*> mTextures;
 	//std::vector<ShaderProgram*> mShaders;
 	std::map<int, ShaderProgram*> mShaders;
 	std::map<int, std::vector<RenderObject>> mRenderables;
@@ -71,8 +71,8 @@ public:
 	void loadShaders();
 
 	void addMesh(MeshDataTex* mesh);
-	void addTexture(Texture* tex);
-	void addRenderObject(Mesh * mesh, Material * tex, int shader, glm::mat4 * model);
+	void addTexture(Texture2D* tex);
+	void addRenderObject(MeshData * mesh, Material * tex, int shader, glm::mat4 * model);
 	void addPointLight(const PointLight& l);
 	void addDirectionalLight(const DirectionalLight& l);
 

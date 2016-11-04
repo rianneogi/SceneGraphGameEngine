@@ -6,8 +6,8 @@ class Water
 {
 public:
 	glm::mat4 mModelMat;
-	Mesh* mMesh;
-	Texture* mDuDvTexture;
+	MeshDataTex* mMesh;
+	Texture2D* mDuDvTexture;
 
 	float mDuDvOffset;
 	float mWaveSpeed;
@@ -19,7 +19,7 @@ public:
 	FrameBuffer mReflectionFBO;
 	FrameBuffer mRefractionFBO;
 
-	Water(Mesh* mesh, Texture* tex);
+	Water(MeshDataTex* mesh, Texture2D* tex);
 	~Water();
 	
 	void update(int deltaTime);

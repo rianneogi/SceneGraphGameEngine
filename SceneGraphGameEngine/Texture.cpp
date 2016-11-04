@@ -1,13 +1,13 @@
 #include "Texture.h"
 
-Texture::Texture()
+Texture2D::Texture2D()
 {
 	mTextureID = 0;
 	mTextureWidth = 0;
 	mTextureHeight = 0;
 }
 
-Texture::Texture(std::string file)
+Texture2D::Texture2D(std::string file)
 {
 	mTextureID = 0;
 	mTextureWidth = 0;
@@ -15,12 +15,12 @@ Texture::Texture(std::string file)
 	loadFromFile(file);
 }
 
-Texture::~Texture()
+Texture2D::~Texture2D()
 {
 	freeTexture();
 }
 
-void Texture::freeTexture()
+void Texture2D::freeTexture()
 {
 	//Delete texture
 	if (mTextureID != 0)
@@ -34,7 +34,7 @@ void Texture::freeTexture()
 	mTextureHeight = 0;
 }
 
-bool Texture::loadTextureFromPixels32(GLuint* pixels, GLuint width, GLuint height)
+bool Texture2D::loadTextureFromPixels32(GLuint* pixels, GLuint width, GLuint height)
 {
 	//Free texture if it exists
 	freeTexture();
@@ -93,7 +93,7 @@ bool Texture::loadTextureFromPixels32(GLuint* pixels, GLuint width, GLuint heigh
 	return true;
 }
 
-bool Texture::loadFromFile(std::string path)
+bool Texture2D::loadFromFile(std::string path)
 {
 	/*if (!mTex.loadFromFile(path, area))
 	{
@@ -142,19 +142,19 @@ bool Texture::loadFromFile(std::string path)
 	return textureLoaded;
 }
 
-void Texture::bind()
+void Texture2D::bind()
 {
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, mTextureID);
 }
 
-void Texture::bind(GLenum textureunit)
+void Texture2D::bind(GLenum textureunit)
 {
 	glActiveTexture(textureunit);
 	glBindTexture(GL_TEXTURE_2D, mTextureID);
 }
 
-void Texture::unbind()
+void Texture2D::unbind()
 {
 	glBindTexture(GL_TEXTURE_2D, NULL);
 }
