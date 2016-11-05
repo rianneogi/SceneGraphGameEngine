@@ -122,7 +122,7 @@ bool Game::init()
 	
 	mRenderer.loadShaders();
 	
-	mRenderer.addDirectionalLight(DirectionalLight(glm::vec3(1, -1, -1), glm::vec3(1, 1, 1), 1));
+	mRenderer.addDirectionalLight(DirectionalLight(glm::vec3(1, -1, 1), glm::vec3(1, 1, 1), 1));
 
 	updateChunks();
 

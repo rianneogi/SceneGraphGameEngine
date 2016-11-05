@@ -23,7 +23,7 @@ uniform vec3 gEyePos;
 uniform struct Light {
 	vec3 pos;
 	vec3 color;
-	float intensity;
+	vec3 attenuation;
 } gLight;
  
 void main()
@@ -38,7 +38,7 @@ void main()
 	
 	vec3 diffuseVector = vec3(cosTheta,cosTheta,cosTheta);
 
-	float attenuation = 1.0/(0.5+ (distance*distance)/gLight.intensity);
+	float attenuation = 1.0/(gLight.attenuation.x + distance*gLight.attenuation.y + (distance*distance)*gLight.attenuation.z);
     
 	//specular
 	vec3 eyeVector = normalize(gEyePos-vertexPosition_worldspace);
