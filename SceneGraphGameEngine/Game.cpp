@@ -109,7 +109,7 @@ bool Game::init()
 	mModels.push_back(new Model());
 	mModels[0]->addMesh(mMeshes[1], mMaterials[0]);
 	mModels[0]->mModelMatrix = glm::scale(glm::mat4(1.0),glm::vec3(1,1,1));
-	//mModels[0]->addToRenderer(&mRenderer);
+	mModels[0]->addToRenderer(&mRenderer);
 
 	mSkybox = new SkyBox(mMeshes[0], mDayTexture);
 	mRenderer.mSkyBox = mSkybox;

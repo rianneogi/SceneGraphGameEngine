@@ -21,6 +21,7 @@ FrameBuffer::~FrameBuffer()
 
 void FrameBuffer::bindForWriting()
 {
+	assert(mFBO != NULL);
 	glBindTexture(GL_TEXTURE_2D, NULL);
 	glBindFramebuffer(GL_FRAMEBUFFER, mFBO);
 	glViewport(0, 0, mWidth, mHeight);

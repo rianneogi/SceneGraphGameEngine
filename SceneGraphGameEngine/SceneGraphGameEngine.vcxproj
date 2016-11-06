@@ -173,6 +173,8 @@
     <None Include="Resources\Shaders\forward_point.glvs" />
     <None Include="Resources\Shaders\phong.glfs" />
     <None Include="Resources\Shaders\phong.glvs" />
+    <None Include="Resources\Shaders\shadow_pass.glfs" />
+    <None Include="Resources\Shaders\shadow_pass.glvs" />
     <None Include="Resources\Shaders\skybox.glfs" />
     <None Include="Resources\Shaders\skybox.glvs" />
     <None Include="Resources\Shaders\water.glfs" />

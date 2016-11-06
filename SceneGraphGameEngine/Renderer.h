@@ -3,8 +3,10 @@
 #include "Water.h"
 #include <map>
 
-enum SHADER_TYPE {NONE = 0, MULTI_TEXTURE = 1, SOLID_COLOR = 2, NORMAL_MAP = 4, PARALLAX_MAP = 8, SPECULAR_MAP = 16, SKYBOX = 32, WATER = 64,
-DIRECTIONAL=128, POINT=256, AMBIENT=512};
+enum SHADER_TYPE {
+	NONE = 0, MULTI_TEXTURE = 1, SOLID_COLOR = 2, NORMAL_MAP = 4, PARALLAX_MAP = 8, SPECULAR_MAP = 16, SKYBOX = 32, WATER = 64,
+	DIRECTIONAL = 128, POINT = 256, AMBIENT = 512, SHADOW_MAP = 1024
+};
 
 struct RenderObject
 {
@@ -77,7 +79,8 @@ public:
 	void addDirectionalLight(const DirectionalLight& l);
 
 	void renderSkybox(const glm::mat4& view, const glm::mat4& projection);
-	void renderShader(int shader, const glm::mat4& view, const glm::mat4& projection);
+	void renderShader(int shader, const glm::mat4& view, const glm::mat4& projection, const glm::mat4& lightView, const glm::mat4& lightProj);
+	void doShadowPass(glm::mat4& lightView, glm::mat4& lightProj);
 	void renderScene(const glm::mat4& view, const glm::mat4& projection);
 	void render();
 };

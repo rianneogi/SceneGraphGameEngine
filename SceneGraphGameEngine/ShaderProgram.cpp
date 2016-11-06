@@ -35,6 +35,7 @@ void ShaderProgram::freeProgram()
 bool ShaderProgram::bind()
 {
 	debugOpengl("pre-bind shader");
+	assert(mProgramID != NULL);
 	glUseProgram(mProgramID);
 	return debugOpengl("post-bind shader");
 }

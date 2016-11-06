@@ -10,6 +10,10 @@ in vec2 UV;
 
 in vec3 lightDirection_tangentspace;
 in vec3 eyeVector_tangentspace;
+
+#ifdef SHADOW_MAP
+in vec4 shadowCoord;
+#endif
  
 out vec4 color;
  
@@ -17,6 +21,10 @@ out vec4 color;
 uniform sampler2DArray gTexture;
 #else
 uniform sampler2D gTexture;
+#endif
+
+#ifdef SHADOW_MAP
+uniform sampler2D gShadowMap;
 #endif
 
 #ifdef NORMAL_MAP
@@ -75,11 +83,22 @@ void main()
 	//float cosAlpha = clamp(normalize(dot(fragNormal,halfway)),0,1);
 	specular = pow(specular,gShineDamper)*gSpecularFactor;
 
-	//vec3 res = gLight.intensity*gLight.color*(diffuseVector + specularVector);
+	float visibility = 1.0;
+
+	#ifdef SHADOW_MAP
+	float bias = 0.35;
+	if ( texture( gShadowMap, shadowCoord.xy ).z  <  shadowCoord.z - bias)
+	{
+		visibility = 1;
+	}
+	#endif
 
     #ifdef SOLID_COLOR
-    color = vec4(res,1.0)*vec4(UV,1.0);
+    color = visibility * gLight.intensity* (vec4(vec3(diffuse),1.0)*vec4(UV,1.0) + vec4(vec3(specular),1.0)*vec4(gLight.color,1.0))
 	#else
-	color = gLight.intensity* (vec4(vec3(diffuse),1.0)*texture( gTexture, finalUV ) + vec4(vec3(specular),1.0)*vec4(gLight.color,1.0));
+	color = visibility * gLight.intensity* (vec4(vec3(diffuse),0.0)*texture( gTexture, finalUV ) + vec4(vec3(specular),0.0)*vec4(gLight.color,0.0));
+	#endif
+	#ifdef SHADOW_MAP
+	color = (texture( gShadowMap, shadowCoord.xy ));
 	#endif
 }

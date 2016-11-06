@@ -28,6 +28,7 @@ void Renderer::loadShaders()
 	mDirectionalShaderTerrain = new ShaderProgram("Resources//Shaders//forward_directional", "#define MULTI_TEXTURE\n");
 	mPointShaderTerrain = new ShaderProgram("Resources//Shaders//forward_point", "#define MULTI_TEXTURE\n");*/
 	mShaders[SKYBOX] = new ShaderProgram("Resources//Shaders//skybox");
+	mShaders[SHADOW_MAP] = new ShaderProgram("Resources//Shaders//shadow_pass");
 	
 	assert(mWater != NULL && mCamera != NULL);
 	mShaders[WATER] = new ShaderProgram("Resources//Shaders//water");
@@ -42,6 +43,10 @@ void Renderer::loadShaders()
 	mShaders[WATER]->setTextureLocation("gRefractionTexture", 1);
 	mShaders[WATER]->setTextureLocation("gDuDv", 2);
 	mShaders[WATER]->setTextureLocation("gDepthTexture", 3);
+
+	mShadowFBO.initFBO(1024, 1024, GL_NONE);
+	mShadowFBO.createDepthTextureAttachment();
+	mShadowFBO.unbind();
 }
 
 void Renderer::addMesh(MeshDataTex * mesh)
@@ -59,6 +64,8 @@ void Renderer::addRenderObject(MeshData * mesh, Material * tex, int shader, glm:
 	RenderObject ro = RenderObject(mesh, tex, shader, model);
 	mRenderObjects.push_back(ro);
 
+	printf("adding to renderer: %d", shader);
+
 	if (!(shader&SKYBOX) && !(shader&WATER))
 	{
 		//make sure the shaders are loaded
@@ -66,23 +73,43 @@ void Renderer::addRenderObject(MeshData * mesh, Material * tex, int shader, glm:
 		{
 			std::string defs = getDefsFromShaderType(shader);
 			mShaders[AMBIENT | shader] = new ShaderProgram("Resources//Shaders//forward_ambient", defs);
-			mShaders[DIRECTIONAL | shader] = new ShaderProgram("Resources//Shaders//forward_directional_tangent", defs);
+			mShaders[DIRECTIONAL | SHADOW_MAP | shader] = new ShaderProgram("Resources//Shaders//forward_directional_tangent", defs+"#define SHADOW_MAP\n");
 			mShaders[POINT | shader] = new ShaderProgram("Resources//Shaders//forward_point", defs);
-
+			printf("creating shader %d\n", DIRECTIONAL | SHADOW_MAP | shader);
+			mShaders[DIRECTIONAL | SHADOW_MAP | shader]->bind();
+			mShaders[DIRECTIONAL | SHADOW_MAP | shader]->setTextureLocation("gTexture", 0);
+			//if (shader&SHADOW_MAP)
+			{
+				mShaders[DIRECTIONAL | SHADOW_MAP | shader]->setTextureLocation("gShadowMap", 1);
+			}
 			if (shader&NORMAL_MAP)
 			{
-				mShaders[DIRECTIONAL | shader]->bind();
-				mShaders[DIRECTIONAL | shader]->setTextureLocation("gTexture", 0);
-				mShaders[DIRECTIONAL | shader]->setTextureLocation("gNormalMap", 1);
-				mShaders[POINT | shader]->bind();
-				mShaders[POINT | shader]->setTextureLocation("gTexture", 0);
-				mShaders[POINT | shader]->setTextureLocation("gNormalMap", 1);
+				mShaders[DIRECTIONAL | SHADOW_MAP | shader]->setTextureLocation("gNormalMap", 2);
+			}
+			if (shader&PARALLAX_MAP)
+			{
+				mShaders[DIRECTIONAL | SHADOW_MAP | shader]->setTextureLocation("gDisplacementMap", 3);
+			}
+			
+			mShaders[POINT | shader]->bind();
+			mShaders[POINT | shader]->setTextureLocation("gTexture", 0);
+			if (shader&SHADOW_MAP)
+			{
+				mShaders[POINT | shader]->setTextureLocation("gShadowMap", 1);
+			}
+			if (shader&NORMAL_MAP)
+			{
+				mShaders[POINT | shader]->setTextureLocation("gNormalMap", 2);
+			}
+			if (shader&PARALLAX_MAP)
+			{
+				mShaders[POINT | shader]->setTextureLocation("gDisplacementMap", 3);
 			}
 		}
 
 		//add to renderables
 		mRenderables[shader | AMBIENT].push_back(ro);
-		mRenderables[shader | DIRECTIONAL].push_back(ro);
+		mRenderables[shader | DIRECTIONAL | SHADOW_MAP].push_back(ro);
 		mRenderables[shader | POINT].push_back(ro);
 	}
 }
@@ -115,10 +142,11 @@ void Renderer::renderSkybox(const glm::mat4& view, const glm::mat4& projection)
 	glCullFace(GL_BACK);
 }
 
-void Renderer::renderShader(int shader, const glm::mat4& view, const glm::mat4& projection)
+void Renderer::renderShader(int shader, const glm::mat4& view, const glm::mat4& projection, const glm::mat4& lightView, const glm::mat4& lightProj)
 {
 	if (mShaders.count(shader) == 0 || mRenderables[shader].size() == 0)
 	{
+		//printf("bad shader: %d\n", shader);
 		return;
 	}
 
@@ -151,8 +179,21 @@ void Renderer::renderShader(int shader, const glm::mat4& view, const glm::mat4& 
 				mShaders[shader]->setUniformFloat("gShineDamper", mRenderables[shader][i].mMaterial->mShineDamper);
 				if (shader&NORMAL_MAP)
 				{
-					mRenderables[shader][i].mMaterial->mNormalMap->bind(GL_TEXTURE1);
+					mRenderables[shader][i].mMaterial->mNormalMap->bind(GL_TEXTURE2);
 				}
+				if (shader&SHADOW_MAP)
+				{
+					mShadowFBO.bindDepthTexture(GL_TEXTURE1);
+					glm::mat4 biasMatrix(
+						0.5, 0.0, 0.0, 0.0,
+						0.0, 0.5, 0.0, 0.0,
+						0.0, 0.0, 0.5, 0.0,
+						0.5, 0.5, 0.5, 1.0
+					);
+					glm::mat4 depthBiasMVP = biasMatrix*lightProj*lightView;
+					mShaders[shader]->setUniformMat4f("gDepthBiasMVP", depthBiasMVP);
+				}
+				
 				mRenderables[shader][i].mMesh->render();
 			}
 		}
@@ -179,6 +220,27 @@ void Renderer::renderShader(int shader, const glm::mat4& view, const glm::mat4& 
 			}
 		}
 	}
+}
+
+void Renderer::doShadowPass(glm::mat4& lightView, glm::mat4& lightProj)
+{
+	float gSunDistance = 100.f;
+
+	mShaders[SHADOW_MAP]->bind();
+	mShadowFBO.bindForWriting();
+	lightView = glm::lookAt((-mDirectionalLights[0].dir), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
+	lightProj = glm::ortho<float>(-2 * gSunDistance, 2 * gSunDistance, -2 * gSunDistance, 2 * gSunDistance, -2 * gSunDistance, 4 * gSunDistance);
+	mShaders[SHADOW_MAP]->setUniformMat4f("gViewMat", lightView);
+	mShaders[SHADOW_MAP]->setUniformMat4f("gProjectionMat", lightProj);
+
+	for (size_t i = 0; i < mRenderables[SHADOW_MAP].size(); i++)
+	{
+		mRenderables[SHADOW_MAP][i].mMaterial->mTexture->bind();
+		mShaders[SHADOW_MAP]->setUniformMat4f("gModelMat", *mRenderables[SHADOW_MAP][i].mModelMat);
+		mRenderables[SHADOW_MAP][i].mMesh->render();
+	}
+
+	mShadowFBO.unbind();
 }
 
 void Renderer::renderScene(const glm::mat4& view, const glm::mat4& projection)
@@ -211,21 +273,29 @@ void Renderer::renderScene(const glm::mat4& view, const glm::mat4& projection)
 		mAmbientShader->setUniformMat4f("gModelMat", *mRenderObjects[i].mModelMat);
 		mRenderObjects[i].mMesh->render();
 	}*/
+	//glClear(GL_DEPTH_BUFFER_BIT);
+	glm::mat4 lightView;
+	glm::mat4 lightProj;
+	doShadowPass(lightView, lightProj);
+	//glClear(GL_DEPTH_BUFFER_BIT);
 
-	renderShader(AMBIENT, view, projection);
-	renderShader(AMBIENT | NORMAL_MAP, view, projection);
-	renderShader(AMBIENT | MULTI_TEXTURE, view, projection);
+	renderShader(AMBIENT, view, projection, lightView, lightProj);
+	renderShader(AMBIENT | NORMAL_MAP, view, projection, lightView, lightProj);
+	renderShader(AMBIENT | MULTI_TEXTURE, view, projection, lightView, lightProj);
+
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_ONE, GL_ONE);
 	glDepthMask(false);
 	glDepthFunc(GL_EQUAL);
-	renderShader(DIRECTIONAL, view, projection);
-	renderShader(DIRECTIONAL | NORMAL_MAP, view, projection);
-	renderShader(DIRECTIONAL | MULTI_TEXTURE, view, projection);
 
-	renderShader(POINT, view, projection);
-	renderShader(POINT | NORMAL_MAP, view, projection);
-	renderShader(POINT | MULTI_TEXTURE, view, projection);
+	mShadowFBO.bindDepthTexture(GL_TEXTURE1);
+	renderShader(DIRECTIONAL, view, projection, lightView, lightProj);
+	renderShader(DIRECTIONAL | NORMAL_MAP | SHADOW_MAP, view, projection, lightView, lightProj);
+	renderShader(DIRECTIONAL | MULTI_TEXTURE | SHADOW_MAP, view, projection, lightView, lightProj);
+
+	renderShader(POINT, view, projection, lightView, lightProj);
+	renderShader(POINT | NORMAL_MAP, view, projection, lightView, lightProj);
+	renderShader(POINT | MULTI_TEXTURE, view, projection, lightView, lightProj);
 
 	/*mDirectionalShader->bind();
 	mDirectionalShader->setUniformMat4f("gViewMat", view);
@@ -370,6 +440,10 @@ std::string getDefsFromShaderType(int shader)
 	if (shader&SOLID_COLOR)
 	{
 		defs += "#define SOLID_COLOR\n";
+	}
+	if (shader&SHADOW_MAP)
+	{
+		defs += "#define SHADOW_MAP\n";
 	}
 	return defs;
 }

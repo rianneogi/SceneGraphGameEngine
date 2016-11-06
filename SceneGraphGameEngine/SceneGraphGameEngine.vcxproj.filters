@@ -197,5 +197,11 @@
     <None Include="Resources\Shaders\forward_directional_tangent.glvs">
       <Filter>Source Files\Shaders</Filter>
     </None>
+    <None Include="Resources\Shaders\shadow_pass.glfs">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="Resources\Shaders\shadow_pass.glvs">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>

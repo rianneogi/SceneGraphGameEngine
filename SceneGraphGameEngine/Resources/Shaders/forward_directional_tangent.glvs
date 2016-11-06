@@ -21,16 +21,22 @@ out vec3 UV;
 #else
 out vec2 UV;
 #endif
+
 out vec3 fragPos;
-//out vec3 fragNormal;
-//out vec3 fragTangent;
-//out vec3 fragBitangent;
 out vec3 lightDirection_tangentspace;
 out vec3 eyeVector_tangentspace;
+
+#ifdef SHADOW_MAP
+out vec4 shadowCoord;
+#endif
  
 uniform mat4 gModelMat;
 uniform mat4 gViewMat;
 uniform mat4 gProjectionMat;
+
+#ifdef SHADOW_MAP
+uniform mat4 gDepthBiasMVP;
+#endif
 
 uniform vec3 gEyePos;
 uniform struct Light {
@@ -54,4 +60,8 @@ void main()
 
 	lightDirection_tangentspace = normalize(toTangentSpace* gLight.dir);
 	eyeVector_tangentspace = normalize(toTangentSpace*(gEyePos-(vertexPosition_worldspace.xyz)));
+
+	#ifdef SHADOW_MAP
+	shadowCoord = gDepthBiasMVP * vec4(vertexPosition_modelspace,1);
+	#endif
 }
