@@ -86,10 +86,10 @@ void main()
 	float visibility = 1.0;
 
 	#ifdef SHADOW_MAP
-	float bias = 0.35;
+	float bias = 0.0035;
 	if ( texture( gShadowMap, shadowCoord.xy ).z  <  shadowCoord.z - bias)
 	{
-		visibility = 1;
+		visibility = 0;
 	}
 	#endif
 
@@ -99,6 +99,6 @@ void main()
 	color = visibility * gLight.intensity* (vec4(vec3(diffuse),0.0)*texture( gTexture, finalUV ) + vec4(vec3(specular),0.0)*vec4(gLight.color,0.0));
 	#endif
 	#ifdef SHADOW_MAP
-	color = (texture( gShadowMap, shadowCoord.xy ));
+	//color = vec4(texture( gShadowMap, UV.xy ).z);
 	#endif
 }

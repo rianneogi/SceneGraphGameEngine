@@ -31,12 +31,14 @@ void FrameBuffer::bindForWriting()
 
 void FrameBuffer::bindColorTexture(GLenum target)
 {
+	assert(mColorTexture != NULL);
 	glActiveTexture(target);
 	glBindTexture(GL_TEXTURE_2D, mColorTexture);
 }
 
 void FrameBuffer::bindDepthTexture(GLenum target)
 {
+	assert(mDepthTexture != NULL);
 	glActiveTexture(target);
 	glBindTexture(GL_TEXTURE_2D, mDepthTexture);
 }
@@ -55,6 +57,7 @@ void FrameBuffer::initFBO(int width, int height, GLenum drawbuffer)
 	glGenFramebuffers(1, &mFBO);
 	glBindFramebuffer(GL_FRAMEBUFFER, mFBO);
 	glDrawBuffer(drawbuffer);
+	//glReadBuffer(drawbuffer);
 	//glBindFramebuffer(GL_FRAMEBUFFER, NULL);
 	debugOpengl("fbo init error");
 

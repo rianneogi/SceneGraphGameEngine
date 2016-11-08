@@ -107,7 +107,7 @@ bool Game::init()
 	mMaterials[0]->mNormalMap = mTextures[1];
 	
 	mModels.push_back(new Model());
-	mModels[0]->addMesh(mMeshes[1], mMaterials[0]);
+	mModels[0]->addMesh(mMeshes[0], mMaterials[0]);
 	mModels[0]->mModelMatrix = glm::scale(glm::mat4(1.0),glm::vec3(1,1,1));
 	mModels[0]->addToRenderer(&mRenderer);
 
