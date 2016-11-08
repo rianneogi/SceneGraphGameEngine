@@ -100,5 +100,6 @@ void main()
 	#endif
 	#ifdef SHADOW_MAP
 	color = vec4(texture( gShadowMap, UV.xy ).z);
+	color = vec4(gl_FragCoord.z/10,gl_FragCoord.z/10,gl_FragCoord.z/10,0);
 	#endif
 }
