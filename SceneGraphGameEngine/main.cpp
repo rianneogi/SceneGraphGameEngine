@@ -133,6 +133,7 @@ bool initGL()
 
 	//Depth test
 	glEnable(GL_DEPTH_TEST);
+	glDepthMask(true);
 	glDepthFunc(GL_LESS);
 
 	//Blending

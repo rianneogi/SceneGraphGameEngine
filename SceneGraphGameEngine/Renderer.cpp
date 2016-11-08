@@ -231,7 +231,8 @@ void Renderer::doShadowPass(glm::mat4& lightView, glm::mat4& lightProj)
 	float gSunDistance = 100.f;
 
 	mShaders[SHADOW_MAP]->bind();
-	mShadowFBO.bindForWriting();
+	//mShadowFBO.bindForWriting();
+	mWater->mRefractionFBO.bindForWriting();
 	GLint drawFboId = 0, readFboId = 0;
 	glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &drawFboId);
 	glGetIntegerv(GL_READ_FRAMEBUFFER_BINDING, &readFboId);
@@ -239,11 +240,12 @@ void Renderer::doShadowPass(glm::mat4& lightView, glm::mat4& lightProj)
 	
 	lightView = glm::lookAt((-mDirectionalLights[0].dir)*gSunDistance, glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
 	lightProj = glm::ortho<float>(-2 * gSunDistance, 2 * gSunDistance, -2 * gSunDistance, 2 * gSunDistance, -2 * gSunDistance, 4 * gSunDistance);
+	//lightProj = glm::perspective<float>(45, 1, 10, 1000);
 	mShaders[SHADOW_MAP]->setUniformMat4f("gViewMat", lightView);
 	mShaders[SHADOW_MAP]->setUniformMat4f("gProjectionMat", lightProj);
 	for (size_t i = 0; i < mRenderables[SHADOW_MAP].size(); i++)
 	{
-		mRenderables[SHADOW_MAP][i].mMaterial->mTexture->bind();
+		//mRenderables[SHADOW_MAP][i].mMaterial->mTexture->bind();
 		mShaders[SHADOW_MAP]->setUniformMat4f("gModelMat", *mRenderables[SHADOW_MAP][i].mModelMat);
 		mRenderables[SHADOW_MAP][i].mMesh->render();
 	}
@@ -277,7 +279,8 @@ void Renderer::renderScene(const glm::mat4& view, const glm::mat4& projection)
 	glDepthMask(false);
 	glDepthFunc(GL_EQUAL);
 
-	mShadowFBO.bindDepthTexture(GL_TEXTURE1);
+	//mShadowFBO.bindDepthTexture(GL_TEXTURE1);
+	mWater->mRefractionFBO.bindDepthTexture(GL_TEXTURE1);
 	renderShader(DIRECTIONAL, view, projection, lightView, lightProj);
 	renderShader(DIRECTIONAL | NORMAL_MAP | SHADOW_MAP, view, projection, lightView, lightProj);
 	renderShader(DIRECTIONAL | MULTI_TEXTURE | SHADOW_MAP, view, projection, lightView, lightProj);
