@@ -21,6 +21,6 @@ void main()
 	#ifdef SOLID_COLOR
     color = 0.1*vec4(UV,1.0);
 	#else
-	color = 0.1*texture( textureSampler, UV );
+	color = 0.5*texture( textureSampler, UV );
 	#endif
 }

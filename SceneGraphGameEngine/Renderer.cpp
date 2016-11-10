@@ -133,7 +133,7 @@ void Renderer::renderSkybox(const glm::mat4& view, const glm::mat4& projection)
 	mShaders[SKYBOX]->setUniformMat4f("gModelMat", glm::translate(glm::mat4(1.0), mCamera->mPosition));
 	mShaders[SKYBOX]->setUniformMat4f("gViewMat", view);
 	mShaders[SKYBOX]->setUniformMat4f("gProjectionMat", projection);
-	mSkyBox->mTexture->bind();
+	mSkyBox->mTexture->bind(GL_TEXTURE0);
 	mSkyBox->mMesh->render();
 
 	glCullFace(GL_BACK);
@@ -181,10 +181,6 @@ void Renderer::renderShader(int shader, const glm::mat4& view, const glm::mat4& 
 				if (shader&SHADOW_MAP)
 				{
 					//mShadowFBO.bindDepthTexture(GL_TEXTURE0);
-					glActiveTexture(GL_TEXTURE1);
-					GLint drawFboId = 0;
-					glGetIntegerv(GL_TEXTURE_BINDING_2D, &drawFboId);
-					//printf("Rendering with: %d %d\n", drawFboId, mShadowFBO.mDepthTexture);
 					glm::mat4 biasMatrix(
 						0.5, 0.0, 0.0, 0.0,
 						0.0, 0.5, 0.0, 0.0,
@@ -215,7 +211,7 @@ void Renderer::renderShader(int shader, const glm::mat4& view, const glm::mat4& 
 				mShaders[shader]->setUniformFloat("gShineDamper", mRenderables[shader][i].mMaterial->mShineDamper);
 				if (shader&NORMAL_MAP)
 				{
-					mRenderables[shader][i].mMaterial->mNormalMap->bind(GL_TEXTURE1);
+					mRenderables[shader][i].mMaterial->mNormalMap->bind(GL_TEXTURE2);
 				}
 				mRenderables[shader][i].mMesh->render();
 			}
@@ -227,27 +223,18 @@ void Renderer::doShadowPass(glm::mat4& lightView, glm::mat4& lightProj)
 {
 	glDepthMask(true);
 	glDepthFunc(GL_LESS);
-	//glCullFace(GL_FRONT);
-	float gSunDistance = 100.f;
+	float gSunDistance = 1000.f;
 
 	mShaders[SHADOW_MAP]->bind();
 	mShadowFBO.bindForWriting();
 	glClear(GL_DEPTH_BUFFER_BIT);
-	//mWater->mRefractionFBO.bindForWriting();
-	GLint drawFboId = 0, readFboId = 0;
-	glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &drawFboId);
-	glGetIntegerv(GL_READ_FRAMEBUFFER_BINDING, &readFboId);
-	//printf("Rendering with: %d %d %d\n", drawFboId, readFboId, mShadowFBO);
 	
 	lightView = glm::lookAt((-mDirectionalLights[0].dir)*gSunDistance, glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
 	lightProj = glm::ortho<float>(-2.0 * gSunDistance, 2.0 * gSunDistance, -2.0 * gSunDistance, 2.0 * gSunDistance, -2.0 * gSunDistance, 4.0 * gSunDistance);
-	//lightProj = glm::perspective<float>(45, 1, 10, 1000);
 	mShaders[SHADOW_MAP]->setUniformMat4f("gViewMat", lightView);
 	mShaders[SHADOW_MAP]->setUniformMat4f("gProjectionMat", lightProj);
 	for (size_t i = 0; i < mRenderables[SHADOW_MAP].size(); i++)
 	{
-		//mRenderables[SHADOW_MAP][i].mMaterial->mTexture->bind();
-		//printMatrix(*mRenderables[SHADOW_MAP][i].mModelMat);
 		mShaders[SHADOW_MAP]->setUniformMat4f("gModelMat", *mRenderables[SHADOW_MAP][i].mModelMat);
 		mRenderables[SHADOW_MAP][i].mMesh->render();
 	}
@@ -255,28 +242,16 @@ void Renderer::doShadowPass(glm::mat4& lightView, glm::mat4& lightProj)
 	mShadowFBO.unbind();
 }
 
-void Renderer::renderScene(const glm::mat4& view, const glm::mat4& projection)
+void Renderer::renderScene(const glm::mat4& view, const glm::mat4& projection, const glm::mat4& lightView, const glm::mat4& lightProj)
 {
 	glDepthMask(true);
 	glDisable(GL_BLEND);
 	glActiveTexture(GL_TEXTURE0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
-	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-	
 	renderSkybox(view, projection);
 
 	glDepthFunc(GL_LESS);
-
-	glm::mat4 lightView;
-	glm::mat4 lightProj;
-	//glViewport(0, 0, 1024, 1024);
-	//glDisable(GL_CULL_FACE);
-	//glCullFace(GL_FRONT);
-	doShadowPass(lightView, lightProj);
-	//glViewport(0, 0, 800, 600);
-	//glEnable(GL_CULL_FACE);
-	//glCullFace(GL_BACK);
 
 	renderShader(AMBIENT, view, projection, lightView, lightProj);
 	renderShader(AMBIENT | NORMAL_MAP, view, projection, lightView, lightProj);
@@ -287,8 +262,6 @@ void Renderer::renderScene(const glm::mat4& view, const glm::mat4& projection)
 	glDepthMask(false);
 	glDepthFunc(GL_EQUAL);
 
-	mShadowFBO.bindDepthTexture(GL_TEXTURE1);
-	//mWater->mRefractionFBO.bindDepthTexture(GL_TEXTURE1);
 	renderShader(DIRECTIONAL, view, projection, lightView, lightProj);
 	renderShader(DIRECTIONAL | NORMAL_MAP | SHADOW_MAP, view, projection, lightView, lightProj);
 	renderShader(DIRECTIONAL | MULTI_TEXTURE | SHADOW_MAP, view, projection, lightView, lightProj);
@@ -302,23 +275,29 @@ void Renderer::render()
 {
 	assert(mCamera != NULL);
 	glm::mat4 model, view, projection;
-	mCamera->render(view, projection);
-	renderScene(view, projection);
+	//mCamera->render(view, projection);
+	//renderScene(view, projection);
 
-	/*mCamera->mPosition = glm::vec3(mCamera->mPosition.x, -mCamera->mPosition.y, mCamera->mPosition.z);
+	glm::mat4 lightView, lightProj;
+	doShadowPass(lightView, lightProj);
+
+	mCamera->mPosition = glm::vec3(mCamera->mPosition.x, -mCamera->mPosition.y, mCamera->mPosition.z);
 	mCamera->mVerticalAngle = -mCamera->mVerticalAngle;
 	mCamera->render(view, projection);
 	mWater->bindReflection();
-	renderScene(view, projection);
+	mShadowFBO.bindDepthTexture(GL_TEXTURE1);
+	renderScene(view, projection, lightView, lightProj);
 
 	mCamera->mPosition = glm::vec3(mCamera->mPosition.x, -mCamera->mPosition.y, mCamera->mPosition.z);
 	mCamera->mVerticalAngle = -mCamera->mVerticalAngle;
 	mCamera->render(view, projection);
 	mWater->bindRefraction();
-	renderScene(view, projection);
+	mShadowFBO.bindDepthTexture(GL_TEXTURE1);
+	renderScene(view, projection, lightView, lightProj);
 	mWater->mRefractionFBO.unbind();
 
-	renderScene(view, projection);
+	mShadowFBO.bindDepthTexture(GL_TEXTURE1);
+	renderScene(view, projection, lightView, lightProj);
 
 	mWater->mReflectionFBO.bindColorTexture(GL_TEXTURE0);
 	mWater->mRefractionFBO.bindColorTexture(GL_TEXTURE1);
@@ -338,7 +317,7 @@ void Renderer::render()
 	mShaders[WATER]->setUniformFloat("gDuDvOffset", mWater->mDuDvOffset);
 	mShaders[WATER]->setUniformVec3f("gEyePos", mCamera->mPosition);
 	mShaders[WATER]->setUniformVec3f("gLightDir", mDirectionalLights[0].dir);
-	mWater->render();*/
+	mWater->render();
 }
 
 std::string getDefsFromShaderType(int shader)

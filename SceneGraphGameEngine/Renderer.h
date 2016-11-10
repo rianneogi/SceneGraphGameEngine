@@ -81,7 +81,7 @@ public:
 	void renderSkybox(const glm::mat4& view, const glm::mat4& projection);
 	void renderShader(int shader, const glm::mat4& view, const glm::mat4& projection, const glm::mat4& lightView, const glm::mat4& lightProj);
 	void doShadowPass(glm::mat4& lightView, glm::mat4& lightProj);
-	void renderScene(const glm::mat4& view, const glm::mat4& projection);
+	void renderScene(const glm::mat4& view, const glm::mat4& projection, const glm::mat4& lightView, const glm::mat4& lightProj);
 	void render();
 };
 

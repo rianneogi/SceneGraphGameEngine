@@ -34,12 +34,12 @@ public:
 
 	GLuint getProgramID();
 
-	void setUniformInt(std::string name, int val);
-	void setUniformFloat(std::string name, float val);
-	void setUniformMat4f(std::string name, glm::mat4 matrix);
-	void setUniformVec3f(std::string name, glm::vec3 vec);
-	void setUniformVec4f(std::string name, glm::vec4 vec);
-	void setTextureLocation(std::string name, unsigned int location);
+	void setUniformInt(const std::string& name, int val);
+	void setUniformFloat(const std::string& name, float val);
+	void setUniformMat4f(const std::string& name, const glm::mat4& matrix);
+	void setUniformVec3f(const std::string& name, const glm::vec3& vec);
+	void setUniformVec4f(const std::string& name, const glm::vec4& vec);
+	void setTextureLocation(const std::string& name, unsigned int location);
 
 protected:
 	void printProgramLog(GLuint program);
