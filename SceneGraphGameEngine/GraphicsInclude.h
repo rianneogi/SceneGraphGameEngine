@@ -18,3 +18,6 @@
 #include <glm\gtx\quaternion.hpp>
 
 bool debugOpengl(std::string errorstring);
+
+void printVector(glm::vec3 v);
+void printMatrix(glm::mat4 m);

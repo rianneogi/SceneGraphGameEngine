@@ -20,6 +20,7 @@ public:
 	int mWidth;
 
 	glm::mat4 mModelMat;
+	glm::mat4 mModelMat2;
 
 	Terrain();
 	Terrain(int i, int j, Material* mat);

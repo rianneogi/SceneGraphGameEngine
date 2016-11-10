@@ -44,6 +44,11 @@ uniform struct Light {
 	vec3 color;
 	float intensity;
 } gLight;
+
+#ifdef SHADOW_MAP
+const int pcf_count = 1;
+const int total_texels = (2*pcf_count + 1) * (2*pcf_count + 1);
+#endif
  
 void main()
 { 
@@ -87,10 +92,44 @@ void main()
 
 	#ifdef SHADOW_MAP
 	float bias = 0.0035;
-	if ( texture( gShadowMap, shadowCoord.xy ).z  <  shadowCoord.z - bias)
+
+	float tex_size = 1.0/4096.0;
+
+	int shadow_count = 0;
+	for(int i = -pcf_count;i<=pcf_count;i++)
 	{
-		visibility = 0.0;
+		for(int j = -pcf_count;j<=pcf_count;j++)
+		{
+		    if ( texture( gShadowMap, shadowCoord.xy + vec2(i,j)*tex_size ).z  <  shadowCoord.z - bias)
+			{
+				shadow_count += 1;
+			}
+		}
 	}
+
+	visibility = 1.0 - shadow_count*1.0/total_texels;
+	/*if(shadow_count==81)
+	{
+		shadow_count = 0;
+		for(int i = -pcf_count;i<=pcf_count;i++)
+		{
+			for(int j = -pcf_count;j<=pcf_count;j++)
+			{
+				if ( texture( gShadowMap, shadowCoord.xy + vec2(i,j)*tex_size ).z  <  shadowCoord.z - bias)
+				{
+					shadow_count += 1;
+				}
+			}
+		}
+
+		visibility = 1.0 - shadow_count*1.0/total_texels;
+	}*/
+
+	//visibility = 1.0;
+	//if ( texture( gShadowMap, shadowCoord.xy ).z  <  shadowCoord.z - bias)
+	//{
+	//	visibility = 0.0;
+	//}
 	#endif
 
     #ifdef SOLID_COLOR
@@ -99,7 +138,9 @@ void main()
 	color = visibility * gLight.intensity* (vec4(vec3(diffuse),0.0)*texture( gTexture, finalUV ) + vec4(vec3(specular),0.0)*vec4(gLight.color,0.0));
 	#endif
 	#ifdef SHADOW_MAP
-	color = vec4(texture( gShadowMap, UV.xy ).z);
-	color = vec4(gl_FragCoord.z/10,gl_FragCoord.z/10,gl_FragCoord.z/10,0);
+	//color = (texture( gShadowMap, UV.xy ));
+
+	//float d = 2.0*0.5*1000 / (1000+0.5 - (2.0*gl_FragCoord.z - 1.0) * (1000-0.5));
+	//color = vec4(d/100);
 	#endif
 }

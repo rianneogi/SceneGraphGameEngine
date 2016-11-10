@@ -38,7 +38,7 @@ void Renderer::loadShaders()
 	mShaders[WATER]->setTextureLocation("gDuDv", 2);
 	mShaders[WATER]->setTextureLocation("gDepthTexture", 3);
 
-	mShadowFBO.initFBO(1024, 1024, GL_NONE);
+	mShadowFBO.initFBO(4096, 4096, GL_NONE);
 	mShadowFBO.createDepthTextureAttachment();
 	mShadowFBO.checkStatus();
 	mShadowFBO.unbind();
@@ -184,14 +184,14 @@ void Renderer::renderShader(int shader, const glm::mat4& view, const glm::mat4& 
 					glActiveTexture(GL_TEXTURE1);
 					GLint drawFboId = 0;
 					glGetIntegerv(GL_TEXTURE_BINDING_2D, &drawFboId);
-					printf("Rendering with: %d %d\n", drawFboId, mShadowFBO.mDepthTexture);
+					//printf("Rendering with: %d %d\n", drawFboId, mShadowFBO.mDepthTexture);
 					glm::mat4 biasMatrix(
 						0.5, 0.0, 0.0, 0.0,
 						0.0, 0.5, 0.0, 0.0,
 						0.0, 0.0, 0.5, 0.0,
 						0.5, 0.5, 0.5, 1.0
 					);
-					glm::mat4 depthBiasMVP = biasMatrix*lightProj*lightView;
+					glm::mat4 depthBiasMVP = biasMatrix*lightProj*lightView*(*mRenderables[shader][i].mModelMat);
 					mShaders[shader]->setUniformMat4f("gDepthBiasMVP", depthBiasMVP);
 				}
 				
@@ -227,25 +227,27 @@ void Renderer::doShadowPass(glm::mat4& lightView, glm::mat4& lightProj)
 {
 	glDepthMask(true);
 	glDepthFunc(GL_LESS);
-
+	//glCullFace(GL_FRONT);
 	float gSunDistance = 100.f;
 
 	mShaders[SHADOW_MAP]->bind();
-	//mShadowFBO.bindForWriting();
-	mWater->mRefractionFBO.bindForWriting();
+	mShadowFBO.bindForWriting();
+	glClear(GL_DEPTH_BUFFER_BIT);
+	//mWater->mRefractionFBO.bindForWriting();
 	GLint drawFboId = 0, readFboId = 0;
 	glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &drawFboId);
 	glGetIntegerv(GL_READ_FRAMEBUFFER_BINDING, &readFboId);
-	printf("Rendering with: %d %d %d\n", drawFboId, readFboId, mShadowFBO);
+	//printf("Rendering with: %d %d %d\n", drawFboId, readFboId, mShadowFBO);
 	
 	lightView = glm::lookAt((-mDirectionalLights[0].dir)*gSunDistance, glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
-	lightProj = glm::ortho<float>(-2 * gSunDistance, 2 * gSunDistance, -2 * gSunDistance, 2 * gSunDistance, -2 * gSunDistance, 4 * gSunDistance);
+	lightProj = glm::ortho<float>(-2.0 * gSunDistance, 2.0 * gSunDistance, -2.0 * gSunDistance, 2.0 * gSunDistance, -2.0 * gSunDistance, 4.0 * gSunDistance);
 	//lightProj = glm::perspective<float>(45, 1, 10, 1000);
 	mShaders[SHADOW_MAP]->setUniformMat4f("gViewMat", lightView);
 	mShaders[SHADOW_MAP]->setUniformMat4f("gProjectionMat", lightProj);
 	for (size_t i = 0; i < mRenderables[SHADOW_MAP].size(); i++)
 	{
 		//mRenderables[SHADOW_MAP][i].mMaterial->mTexture->bind();
+		//printMatrix(*mRenderables[SHADOW_MAP][i].mModelMat);
 		mShaders[SHADOW_MAP]->setUniformMat4f("gModelMat", *mRenderables[SHADOW_MAP][i].mModelMat);
 		mRenderables[SHADOW_MAP][i].mMesh->render();
 	}
@@ -260,15 +262,21 @@ void Renderer::renderScene(const glm::mat4& view, const glm::mat4& projection)
 	glActiveTexture(GL_TEXTURE0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
-	glm::mat4 lightView;
-	glm::mat4 lightProj;
-	doShadowPass(lightView, lightProj);
-
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 	
 	renderSkybox(view, projection);
 
 	glDepthFunc(GL_LESS);
+
+	glm::mat4 lightView;
+	glm::mat4 lightProj;
+	//glViewport(0, 0, 1024, 1024);
+	//glDisable(GL_CULL_FACE);
+	//glCullFace(GL_FRONT);
+	doShadowPass(lightView, lightProj);
+	//glViewport(0, 0, 800, 600);
+	//glEnable(GL_CULL_FACE);
+	//glCullFace(GL_BACK);
 
 	renderShader(AMBIENT, view, projection, lightView, lightProj);
 	renderShader(AMBIENT | NORMAL_MAP, view, projection, lightView, lightProj);
@@ -279,8 +287,8 @@ void Renderer::renderScene(const glm::mat4& view, const glm::mat4& projection)
 	glDepthMask(false);
 	glDepthFunc(GL_EQUAL);
 
-	//mShadowFBO.bindDepthTexture(GL_TEXTURE1);
-	mWater->mRefractionFBO.bindDepthTexture(GL_TEXTURE1);
+	mShadowFBO.bindDepthTexture(GL_TEXTURE1);
+	//mWater->mRefractionFBO.bindDepthTexture(GL_TEXTURE1);
 	renderShader(DIRECTIONAL, view, projection, lightView, lightProj);
 	renderShader(DIRECTIONAL | NORMAL_MAP | SHADOW_MAP, view, projection, lightView, lightProj);
 	renderShader(DIRECTIONAL | MULTI_TEXTURE | SHADOW_MAP, view, projection, lightView, lightProj);

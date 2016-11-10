@@ -3,11 +3,11 @@
 float CONST_BLOCKSIZE = 1.0f;
 int CONST_CHUNKSIZE = 128;
 
-Terrain::Terrain() : mMesh(NULL), mMaterial(NULL), mChunkPos(0,0), mModelMat(1.0)
+Terrain::Terrain() : mMesh(NULL), mMaterial(NULL), mChunkPos(0,0), mModelMat(1.0f)
 {
 }
 
-Terrain::Terrain(int i, int j, Material* mat) : mMesh(NULL), mMaterial(mat), mChunkPos(i, j), mModelMat(1.0)
+Terrain::Terrain(int i, int j, Material* mat) : mMesh(NULL), mMaterial(mat), mChunkPos(i, j), mModelMat(1.0f)
 {
 }
 
@@ -142,4 +142,6 @@ void Terrain::flatten(int x, int y, int l, int w, int height)
 void Terrain::addToRenderer(Renderer* renderer)
 {
 	renderer->addRenderObject(mMesh, mMaterial, MULTI_TEXTURE, &mModelMat);
+	//mModelMat2 = glm::translate(glm::vec3(0, -0.025, 0));
+	//renderer->addRenderObject(mMesh, mMaterial, MULTI_TEXTURE, &mModelMat2);
 }
